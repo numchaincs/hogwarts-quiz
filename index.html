@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hogwarts Sorting Quiz</title>
+<script defer src="/_vercel/insights/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -788,7 +789,7 @@ const TEXT = {
     sortingTitle: "The Sorting Hat Deliberates...",
     sortingLabel: "Examining your soul",
     revealLabel: "✦ The Sorting Hat Declares ✦",
-    retakeLabel: "↺  Retake the Sorting",
+    retakeLabel: "↺ Retake the Sorting",
     traitsLabel: "Your traits",
     houses: {
       gryffindor: { name: "Gryffindor", motto: "Brave of Heart, Strong of Soul", desc: "You belong in Gryffindor — the house of courage, bravery, and nerve. You charge into challenges head-on, defend others without hesitation, and lead by example. The lion's spirit runs in your blood." },
@@ -865,7 +866,7 @@ const TEXT = {
     sortingTitle: "หมวกคัดสรรกำลังพิจารณา...",
     sortingLabel: "กำลังตรวจสอบจิตวิญญาณของคุณ",
     revealLabel: "✦ หมวกคัดสรรประกาศ ✦",
-    retakeLabel: "↺  ทำแบบทดสอบใหม่",
+    retakeLabel: "↺ ทำแบบทดสอบใหม่",
     traitsLabel: "ลักษณะนิสัยของคุณ",
     houses: {
       gryffindor: { name: "กริฟฟินดอร์", motto: "กล้าหาญ มีหัวใจ แข็งแกร่ง", desc: "คุณเป็นของกริฟฟินดอร์ — บ้านแห่งความกล้าหาญ ความมุ่งมั่น และจิตใจที่แน่วแน่ คุณพร้อมเผชิญความท้าทายโดยตรง ปกป้องผู้อื่นโดยไม่ลังเล และเป็นผู้นำด้วยตัวอย่าง วิญญาณของสิงโตไหลเวียนอยู่ในสายเลือดคุณ" },
@@ -1212,7 +1213,6 @@ function renderResult() {
           <p class="house-desc">${houseData.desc}</p>
 
           <div class="result-actions">
-            <!-- ปุ่ม 1: ชวนมักเกิลมาเล่น = share link -->
             <button class="share-btn" id="share-btn-main" onclick="inviteMuggles()">
               <div class="share-spinner"></div>
               <svg class="share-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1221,7 +1221,6 @@ function renderResult() {
               </svg>
               <span class="share-label">${LANG.current === 'th' ? '🧙 ชวนพวกมักเกิลมาเล่นสิ' : '🧙 Invite Your Muggle Friends'}</span>
             </button>
-            <!-- ปุ่ม 2: แชร์การ์ด = download image -->
             <button class="download-btn" id="download-btn-main" onclick="downloadCard('${house}')">
               <div class="dl-spinner"></div>
               <svg class="dl-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1254,7 +1253,6 @@ function startHouseParticles(house) {
   const canvas = document.getElementById('house-particle-canvas');
   if (!canvas || !banner) return;
 
-  // Size canvas to banner
   function resize() {
     canvas.width  = banner.offsetWidth;
     canvas.height = banner.offsetHeight;
@@ -1265,7 +1263,6 @@ function startHouseParticles(house) {
   let particles = [];
   let shootingStars = [];
 
-  // ── GRYFFINDOR — fire embers ──────────────────────────────
   if (house === 'gryffindor') {
     function spawnFire() {
       const x = Math.random() * canvas.width;
@@ -1276,7 +1273,7 @@ function startHouseParticles(house) {
         size: Math.random() * 6 + 2,
         life: 1,
         decay: Math.random() * 0.012 + 0.008,
-        hue: Math.random() * 30,        // 0–30 → red-orange
+        hue: Math.random() * 30,
         type: Math.random() < 0.3 ? 'ember' : 'flame'
       });
     }
@@ -1322,7 +1319,6 @@ function startHouseParticles(house) {
           ctx.fill();
           ctx.restore();
         } else {
-          // teardrop flame shape
           ctx.save();
           ctx.globalAlpha = a * 0.55;
           const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y - p.size, p.size * 1.5);
@@ -1338,10 +1334,7 @@ function startHouseParticles(house) {
       });
     }
     drawFire(0);
-  }
-
-  // ── HUFFLEPUFF — soft golden bubbles & petals ─────────────
-  else if (house === 'hufflepuff') {
+  } else if (house === 'hufflepuff') {
     for (let i = 0; i < 50; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -1351,7 +1344,7 @@ function startHouseParticles(house) {
         r: Math.random() * 8 + 3,
         life: Math.random(),
         decay: Math.random() * 0.004 + 0.002,
-        hue: Math.random() * 40 + 30, // warm yellow-amber
+        hue: Math.random() * 40 + 30,
         wobble: Math.random() * Math.PI * 2,
         wobbleSpeed: Math.random() * 0.03 + 0.01,
         type: Math.random() < 0.4 ? 'petal' : 'bubble'
@@ -1406,7 +1399,6 @@ function startHouseParticles(house) {
           ctx.stroke();
           ctx.restore();
         } else {
-          // soft petal
           ctx.save();
           ctx.globalAlpha = a * 0.7;
           ctx.translate(p.x, p.y);
@@ -1422,11 +1414,7 @@ function startHouseParticles(house) {
       });
     }
     drawHuff(0);
-  }
-
-  // ── RAVENCLAW — stars & shooting stars ───────────────────
-  else if (house === 'ravenclaw') {
-    // Static sparkle stars
+  } else if (house === 'ravenclaw') {
     for (let i = 0; i < 55; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -1434,7 +1422,7 @@ function startHouseParticles(house) {
         r: Math.random() * 2.5 + 0.5,
         phase: Math.random() * Math.PI * 2,
         speed: Math.random() * 0.04 + 0.01,
-        hue: Math.random() * 60 + 190, // blue-silver
+        hue: Math.random() * 60 + 190,
         life: 1,
         twinkle: Math.random() < 0.4
       });
@@ -1457,7 +1445,6 @@ function startHouseParticles(house) {
       particleAnimId = requestAnimationFrame(drawRaven);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Shooting stars (occasional)
       if (Math.random() < 0.012) spawnShooter();
       shootingStars = shootingStars.filter(s => s.life > 0);
       shootingStars.forEach(s => {
@@ -1478,7 +1465,6 @@ function startHouseParticles(house) {
         ctx.moveTo(s.x, s.y);
         ctx.lineTo(s.x - s.vx * (s.len / 6), s.y - s.vy * (s.len / 6));
         ctx.stroke();
-        // bright head dot
         ctx.fillStyle = `hsla(${s.hue},100%,95%,${a})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
@@ -1486,7 +1472,6 @@ function startHouseParticles(house) {
         ctx.restore();
       });
 
-      // Sparkle stars
       particles.forEach(p => {
         const blink = 0.5 + 0.5 * Math.sin(ts * p.speed + p.phase);
         const a = p.twinkle ? blink * 0.9 : 0.6;
@@ -1496,8 +1481,6 @@ function startHouseParticles(house) {
         ctx.globalAlpha = a;
         ctx.shadowColor = `hsl(${p.hue},100%,80%)`;
         ctx.shadowBlur = p.twinkle ? 12 * blink : 4;
-
-        // 4-pointed star sparkle
         ctx.fillStyle = `hsl(${p.hue},80%,85%)`;
         ctx.translate(p.x, p.y);
         ctx.beginPath();
@@ -1516,10 +1499,7 @@ function startHouseParticles(house) {
       });
     }
     drawRaven(0);
-  }
-
-  // ── SLYTHERIN — flowing green mist & serpent wisps ────────
-  else if (house === 'slytherin') {
+  } else if (house === 'slytherin') {
     const NUM = 45;
     for (let i = 0; i < NUM; i++) {
       particles.push({
@@ -1532,14 +1512,13 @@ function startHouseParticles(house) {
         decay: Math.random() * 0.005 + 0.002,
         phase: Math.random() * Math.PI * 2,
         speed: Math.random() * 0.02 + 0.005,
-        hue: Math.random() * 30 + 100, // green range
+        hue: Math.random() * 30 + 100,
         sat: Math.random() * 40 + 50,
         bright: Math.random() * 20 + 30,
         snake: Math.random() < 0.3
       });
     }
 
-    // Serpent wisp nodes (chain of dots)
     const wisps = Array.from({length: 3}, (_, wi) => ({
       nodes: Array.from({length: 12}, (_, ni) => ({
         x: Math.random() * canvas.width,
@@ -1555,7 +1534,6 @@ function startHouseParticles(house) {
       particleAnimId = requestAnimationFrame(drawSlytherin);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Mist blobs
       particles.forEach(p => {
         p.phase += p.speed;
         p.x += p.vx + Math.cos(p.phase) * 0.4;
@@ -1582,27 +1560,23 @@ function startHouseParticles(house) {
         ctx.restore();
       });
 
-      // Serpent wisps — sinuous glowing trails
       wisps.forEach((w, wi) => {
         w.angle += w.speed + Math.sin(ts * 0.001 + wi) * 0.005;
         const head = w.nodes[0];
         head.x += Math.cos(w.angle + Math.sin(ts * 0.0015 + wi * 2) * 0.8) * 1.5;
         head.y += Math.sin(w.angle + Math.cos(ts * 0.001 + wi * 1.5) * 0.6) * 1.2;
 
-        // Wrap around
         if (head.x < 0) head.x = canvas.width;
         if (head.x > canvas.width) head.x = 0;
         if (head.y < 0) head.y = canvas.height;
         if (head.y > canvas.height) head.y = 0;
 
-        // Chain follow
         for (let ni = w.nodes.length - 1; ni > 0; ni--) {
           const curr = w.nodes[ni], prev = w.nodes[ni - 1];
           curr.x += (prev.x - curr.x) * 0.18;
           curr.y += (prev.y - curr.y) * 0.18;
         }
 
-        // Draw wisp as a glowing path
         ctx.save();
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
@@ -1619,7 +1593,6 @@ function startHouseParticles(house) {
             ctx.lineTo(node.x, node.y);
             ctx.stroke();
           }
-          // Glow dot on head
           if (ni === 0) {
             ctx.globalAlpha = 0.9;
             ctx.fillStyle = `hsl(${w.hue},100%,80%)`;
@@ -1648,24 +1621,18 @@ function hogwartsCrestSVG(size=90) {
         <stop offset="100%" stop-color="#8B6914"/>
       </radialGradient>
     </defs>
-    <!-- Shield -->
     <path d="M50 8 L88 22 L88 55 Q88 80 50 95 Q12 80 12 55 L12 22 Z" fill="rgba(10,8,18,0.8)" stroke="url(#cg)" stroke-width="2"/>
-    <!-- Quadrants -->
     <path d="M50 8 L88 22 L88 55 Q88 67 50 51.5 Z" fill="rgba(116,0,1,0.6)"/>
     <path d="M12 22 L50 8 L50 51.5 Q12 67 12 55 Z" fill="rgba(14,26,64,0.6)"/>
     <path d="M50 51.5 Q88 67 88 55 L88 55 Q88 80 50 95 Z" fill="rgba(236,185,57,0.4)"/>
     <path d="M12 55 Q12 80 50 95 L50 51.5 Q12 67 12 55 Z" fill="rgba(26,71,42,0.6)"/>
-    <!-- Center dividers -->
     <line x1="50" y1="8" x2="50" y2="95" stroke="url(#cg)" stroke-width="1" opacity="0.6"/>
     <line x1="12" y1="51.5" x2="88" y2="51.5" stroke="url(#cg)" stroke-width="1" opacity="0.6"/>
-    <!-- Corner emblems -->
     <text x="72" y="36" font-size="14" text-anchor="middle" dominant-baseline="middle">🦁</text>
     <text x="28" y="36" font-size="14" text-anchor="middle" dominant-baseline="middle">🦅</text>
     <text x="72" y="66" font-size="14" text-anchor="middle" dominant-baseline="middle">🦡</text>
     <text x="28" y="66" font-size="14" text-anchor="middle" dominant-baseline="middle">🐍</text>
-    <!-- H letter -->
     <text x="50" y="52" font-size="18" font-family="serif" font-weight="bold" fill="url(#cg)" text-anchor="middle" dominant-baseline="middle">H</text>
-    <!-- Stars at top -->
     <text x="50" y="14" font-size="8" fill="#C9A84C" text-anchor="middle">✦</text>
   </svg>`;
 }
@@ -1679,27 +1646,21 @@ function startQuiz() {
 }
 
 function selectOption(house, el) {
-  // Deselect all
   document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
   state.selected = house;
-
-  // Show next button
   const btn = document.getElementById('next-btn');
   if (btn) btn.classList.add('visible');
 }
 
 function nextQuestion() {
   if (!state.selected) return;
-
   state.scores[state.selected]++;
   state.answers.push(state.selected);
   state.selected = null;
 
   if (state.currentQ < 4) {
     state.currentQ++;
-
-    // Slide transition
     const card = document.querySelector('.card');
     if (card) {
       card.classList.add('slide-out-left');
@@ -1713,9 +1674,6 @@ function nextQuestion() {
   }
 }
 
-// ─────────────────────────────────────────────
-// TOAST
-// ─────────────────────────────────────────────
 let toastTimer = null;
 function showToast(icon, msg) {
   const el = document.getElementById('toast');
@@ -1730,9 +1688,6 @@ function showToast(icon, msg) {
   }, 3000);
 }
 
-// ─────────────────────────────────────────────
-// GENERATE RICH RESULT CARD (1080×1920 IG-ready)
-// ─────────────────────────────────────────────
 function generateRichCard(house) {
   return new Promise(resolve => {
     const W = 1080, H = 1920;
@@ -1752,7 +1707,6 @@ function generateRichCard(house) {
     const houseData = tx.houses[house];
     const traits = tx.traits[house];
 
-    // ── 1. Background ──────────────────────────────
     const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
     bgGrad.addColorStop(0,   hc.bg1);
     bgGrad.addColorStop(0.4, hc.bg2);
@@ -1760,14 +1714,12 @@ function generateRichCard(house) {
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // radial glow center
     const glow = ctx.createRadialGradient(W/2, H*0.38, 0, W/2, H*0.38, W*0.75);
     glow.addColorStop(0, hc.glow);
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, H);
 
-    // ── 2. Stars ──────────────────────────────────
     ctx.save();
     for (let i = 0; i < 260; i++) {
       const sx = Math.random() * W, sy = Math.random() * H;
@@ -1778,7 +1730,6 @@ function generateRichCard(house) {
     }
     ctx.restore();
 
-    // ── 3. Outer border frames ─────────────────────
     ctx.save();
     ctx.strokeStyle = hc.accent; ctx.lineWidth = 5; ctx.globalAlpha = 0.45;
     ctx.strokeRect(44, 44, W-88, H-88);
@@ -1786,13 +1737,11 @@ function generateRichCard(house) {
     ctx.strokeRect(60, 60, W-120, H-120);
     ctx.restore();
 
-    // ── 4. Corner ✦ ────────────────────────────────
     ctx.save();
     ctx.fillStyle = hc.accent; ctx.font = '52px serif'; ctx.globalAlpha = 0.55; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     [[80,80],[W-80,80],[80,H-80],[W-80,H-80]].forEach(([x,y]) => ctx.fillText('✦',x,y));
     ctx.restore();
 
-    // helper: draw text with optional shadow
     function drawText(text, x, y, font, color, alpha=1, shadowBlur=0, shadowColor='') {
       ctx.save();
       ctx.font = font; ctx.fillStyle = color; ctx.globalAlpha = alpha;
@@ -1802,7 +1751,6 @@ function generateRichCard(house) {
       ctx.restore();
     }
 
-    // helper: wrap text into lines
     function wrapText(text, maxWidth, font) {
       ctx.save(); ctx.font = font;
       const words = text.split(' ');
@@ -1817,40 +1765,27 @@ function generateRichCard(house) {
       return lines;
     }
 
-    // ── 5. Top label ───────────────────────────────
     drawText('HOGWARTS SORTING', W/2, 185, 'bold 40px Arial Narrow, Arial, sans-serif', hc.accent, 0.5);
-
-    // thin rule
     ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.25; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(130,225); ctx.lineTo(W-130,225); ctx.stroke(); ctx.restore();
-
-    drawText('✦  THE SORTING HAT DECLARES  ✦', W/2, 270, '36px Arial, sans-serif', hc.accent, 0.55);
-
-    // ── 6. House Emoji ─────────────────────────────
+    drawText('✦ THE SORTING HAT DECLARES ✦', W/2, 270, '36px Arial, sans-serif', hc.accent, 0.55);
     drawText(hc.emoji, W/2, 560, '290px serif', '#fff', 1, 60, hc.accent);
 
-    // ── 7. House Name ──────────────────────────────
     const houseNames = {
       en:{ gryffindor:'GRYFFINDOR', hufflepuff:'HUFFLEPUFF', ravenclaw:'RAVENCLAW', slytherin:'SLYTHERIN' },
       th:{ gryffindor:'กริฟฟินดอร์', hufflepuff:'ฮัฟเฟิลพัฟฟ์', ravenclaw:'เรเวนคลอว์', slytherin:'สลิธีรีน' }
     };
     const nameFontSize = lang==='th' ? 100 : 92;
-    const nameFont = lang==='th'
-      ? `bold ${nameFontSize}px Arial, sans-serif`
-      : `bold ${nameFontSize}px Arial Narrow, Arial, sans-serif`;
+    const nameFont = lang==='th' ? `bold ${nameFontSize}px Arial, sans-serif` : `bold ${nameFontSize}px Arial Narrow, Arial, sans-serif`;
     drawText(houseNames[lang][house], W/2, 800, nameFont, hc.accent, 1, 36, hc.accent);
 
-    // ── 8. Motto ───────────────────────────────────
-    drawText(`"${houseData.motto}"`, W/2, 910,
-      `italic 46px ${lang==='th'?'Arial':'Georgia'}, serif`, 'rgba(245,232,200,0.72)', 1);
+    drawText(`"${houseData.motto}"`, W/2, 910, `italic 46px ${lang==='th'?'Arial':'Georgia'}, serif`, 'rgba(245,232,200,0.72)', 1);
 
-    // ── 9. Divider ────────────────────────────────
     ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.25; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(150,975); ctx.lineTo(W-150,975); ctx.stroke();
     drawText('⟡', W/2, 975, '42px serif', hc.accent, 0.55);
     ctx.restore();
 
-    // ── 10. Traits pills ──────────────────────────
     const PILL_H = 64, PILL_R = 32, PILL_GAP = 18;
     const pillFont = `500 34px ${lang==='th'?'Arial':'Arial Narrow'}, Arial, sans-serif`;
     ctx.save(); ctx.font = pillFont;
@@ -1860,7 +1795,6 @@ function generateRichCard(house) {
     const py = 1030;
     traits.forEach((tr, i) => {
       const pw = pillWidths[i];
-      // pill bg
       ctx.save();
       ctx.fillStyle = hc.pillBg; ctx.globalAlpha = 0.85;
       ctx.beginPath();
@@ -1869,7 +1803,6 @@ function generateRichCard(house) {
       ctx.strokeStyle = hc.accent; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
       ctx.stroke();
       ctx.restore();
-      // text
       ctx.save();
       ctx.font = pillFont; ctx.fillStyle = hc.accent; ctx.globalAlpha = 0.95;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -1879,11 +1812,9 @@ function generateRichCard(house) {
     });
     ctx.restore();
 
-    // ── 11. Thin rule ─────────────────────────────
     ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.18; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(130,1100); ctx.lineTo(W-130,1100); ctx.stroke(); ctx.restore();
 
-    // ── 12. Description ───────────────────────────
     const descFont = `${lang==='th'?'400':'normal'} 40px ${lang==='th'?'Arial':'Georgia'}, serif`;
     const descLines = wrapText(houseData.desc, W - 200, descFont);
     ctx.save(); ctx.font = descFont; ctx.fillStyle = 'rgba(245,232,200,0.8)';
@@ -1895,110 +1826,54 @@ function generateRichCard(house) {
     });
     ctx.restore();
 
-    // ── 13. Bottom divider ────────────────────────
     const divY = H - 260;
     ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.25; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(130, divY); ctx.lineTo(W-130, divY); ctx.stroke();
     drawText('✦', W/2, divY, '36px serif', hc.accent, 0.45);
     ctx.restore();
 
-    // ── 14. CTA url ───────────────────────────────
-    drawText('🎩 hogwarts-quiz-ivory.vercel.app', W/2, H-195,
-      '40px Arial, sans-serif', hc.accent, 0.55);
-
-    // ── 15. Hashtags ──────────────────────────────
-    drawText('#HogwartsQuiz  #WizardingWorld  #SortingHat', W/2, H-130,
-      '32px Arial, sans-serif', 'rgba(245,232,200,0.35)', 1);
-
-    // ── 16. Created by ────────────────────────────
-    drawText('Created by Numchai Ncs', W/2, H-68,
-      '28px Arial, sans-serif', hc.accent, 0.38);
+    drawText('🎩 hogwarts-quiz-ivory.vercel.app', W/2, H-195, '40px Arial, sans-serif', hc.accent, 0.55);
+    drawText('#HogwartsQuiz #WizardingWorld #SortingHat', W/2, H-130, '32px Arial, sans-serif', 'rgba(245,232,200,0.35)', 1);
+    drawText('Created by Numchai Ncs', W/2, H-68, '28px Arial, sans-serif', hc.accent, 0.38);
 
     resolve(c);
   });
 }
 
-// ─────────────────────────────────────────────
-// INVITE MUGGLES — share quiz link
-// ─────────────────────────────────────────────
 async function inviteMuggles() {
-  const QUIZ_URL = 'https://hogwarts-quiz-ivory.vercel.app/';
-  const shareText = LANG.current === 'th'
-    ? '🎩 มาลองดูกันสิว่าคุณจะได้อยู่บ้านไหนในฮอกวอตส์!'
-    : '🎩 Find out which Hogwarts house you belong to!';
-
+  const QUIZ_URL = window.location.href;
+  const shareText = LANG.current === 'th' ? '🎩 มาลองดูกันสิว่าคุณจะได้อยู่บ้านไหนในฮอกวอตส์!' : '🎩 Find out which Hogwarts house you belong to!';
   if (navigator.share) {
-    try {
-      await navigator.share({ title: 'Hogwarts Sorting Quiz', text: shareText, url: QUIZ_URL });
-      return;
-    } catch(e) {
-      if (e.name === 'AbortError') return;
-    }
+    try { await navigator.share({ title: 'Hogwarts Sorting Quiz', text: shareText, url: QUIZ_URL }); return; } catch(e) { if (e.name === 'AbortError') return; }
   }
-  // fallback: copy link
-  try {
-    await navigator.clipboard.writeText(QUIZ_URL);
-    showToast('🧙', LANG.current === 'th' ? 'คัดลอกลิ้งค์แล้ว! ส่งให้มักเกิลได้เลย' : 'Link copied! Send it to your muggle friends');
-  } catch {
-    window.prompt('Copy this link:', QUIZ_URL);
-  }
+  try { await navigator.clipboard.writeText(QUIZ_URL); showToast('🧙', LANG.current === 'th' ? 'คัดลอกลิ้งค์แล้ว! ส่งให้มักเกิลได้เลย' : 'Link copied! Send it to your muggle friends'); } catch { window.prompt('Copy this link:', QUIZ_URL); }
 }
 
-// ─────────────────────────────────────────────
-// DOWNLOAD CARD — rich image with traits + desc
-// ─────────────────────────────────────────────
 async function downloadCard(house) {
   const btn = document.getElementById('download-btn-main');
   if (btn) {
     btn.classList.add('loading');
-    btn.querySelector('span') && (btn.querySelector('span').textContent =
-      LANG.current === 'th' ? 'กำลังสร้างการ์ด...' : 'Creating card...');
+    btn.querySelector('span') && (btn.querySelector('span').textContent = LANG.current === 'th' ? 'กำลังสร้างการ์ด...' : 'Creating card...');
   }
-
   function resetBtn() {
     if (!btn) return;
     btn.classList.remove('loading');
     const sp = btn.querySelector('span');
     if (sp) sp.textContent = LANG.current === 'th' ? '📸 แชร์การ์ดของคุณ' : '📸 Save Your House Card';
   }
-
   try {
     const canvas = await generateRichCard(house);
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
     const file = new File([blob], `hogwarts-${house}-card.png`, { type: 'image/png' });
-
-    // iOS/Android: native share with image → IG Stories option
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       resetBtn();
-      try {
-        await navigator.share({
-          files: [file],
-          title: 'Hogwarts Sorting Quiz',
-          text: LANG.current === 'th'
-            ? `ฉันได้บ้าน ${TEXT[LANG.current].houses[house].name} ในฮอกวอตส์! 🎩`
-            : `I got sorted into ${TEXT.en.houses[house].name} at Hogwarts! 🎩`
-        });
-        return;
-      } catch(e) {
-        if (e.name === 'AbortError') { resetBtn(); return; }
-      }
+      try { await navigator.share({ files: [file], title: 'Hogwarts Sorting Quiz', text: LANG.current === 'th' ? `ฉันได้บ้าน ${TEXT[LANG.current].houses[house].name} ในฮอกวอตส์! 🎩` : `I got sorted into ${TEXT.en.houses[house].name} at Hogwarts! 🎩` }); return; } catch(e) { if (e.name === 'AbortError') { resetBtn(); return; } }
     }
-
-    // Desktop / fallback: direct download
     resetBtn();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `hogwarts-${house}-card.png`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `hogwarts-${house}-card.png`; a.click(); URL.revokeObjectURL(a.href);
     showToast('📸', LANG.current === 'th' ? 'บันทึกการ์ดลงเครื่องแล้ว!' : 'Card saved to your device!');
-
-  } catch(err) {
-    resetBtn();
-    showToast('⚠️', LANG.current === 'th' ? 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง' : 'Something went wrong, please try again');
-  }
+  } catch(err) { resetBtn(); showToast('⚠️', LANG.current === 'th' ? 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง' : 'Something went wrong, please try again'); }
 }
-
 
 function retake() {
   if (particleAnimId) { cancelAnimationFrame(particleAnimId); particleAnimId = null; }
@@ -2006,22 +1881,13 @@ function retake() {
   render();
 }
 
-// ─────────────────────────────────────────────
-// LANG TOGGLE
-// ─────────────────────────────────────────────
 document.getElementById('lang-btn').addEventListener('click', () => {
   LANG.current = LANG.current === 'en' ? 'th' : 'en';
   document.getElementById('lang-btn').textContent = LANG.current === 'en' ? 'TH / EN' : 'EN / TH';
-  // Update body font for Thai
-  document.body.style.fontFamily = LANG.current === 'th'
-    ? "'Kanit', 'Crimson Text', serif"
-    : "'Crimson Text', 'Kanit', serif";
+  document.body.style.fontFamily = LANG.current === 'th' ? "'Kanit', 'Crimson Text', serif" : "'Crimson Text', 'Kanit', serif";
   render();
 });
 
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
 render();
 </script>
 </body>
