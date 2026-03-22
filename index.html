@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hogwarts Sorting Quiz</title>
 <script defer src="/_vercel/insights/script.js"></script>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/analytics/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -886,7 +890,7 @@ const TEXT = {
         text: "คุณให้คุณค่ากับสิ่งใดมากที่สุดในตัวเอง?",
         opts: [
           { text: "ความกล้าหาญ — ฉันเผชิญกับความกลัวโดยตรง ไม่ว่าจะเสี่ยงแค่ไหน", house: 'gryffindor' },
-          { text: "ความซื่อสัตย์ — ฉันยืนหยัดเคียงข้างคนที่รัก ไม่ว่าจะเกิดอะไรขึ้น", house: 'hufflepuff' },
+          { text: "ความซื่อสัตย์ — ฉันยืนหยัดเคียงข้างคนที่รัก ไม่ว่าจะเกิดอะ��รขึ้น", house: 'hufflepuff' },
           { text: "ปัญญา — ฉันคิดก่อนทำและชอบเรียนรู้สิ่งใหม่ๆ", house: 'ravenclaw' },
           { text: "ความทะเยอทะยาน — ฉันรู้ว่าต้องการอะไรและมุ่งมั่นจะได้มัน", house: 'slytherin' }
         ]
@@ -1639,7 +1643,7 @@ function hogwartsCrestSVG(size=90) {
 
 // ─────────────────────────────────────────────
 // ACTIONS
-// ─────────────────────────────────────────────
+// ───────���─────────────────────────────────────
 function startQuiz() {
   state = { screen: 'quiz', currentQ: 0, selected: null, answers: [], scores: { gryffindor:0, hufflepuff:0, ravenclaw:0, slytherin:0 }, result: null };
   render();
@@ -1699,7 +1703,7 @@ function generateRichCard(house) {
       gryffindor: { bg1:'#1A0000', bg2:'#5A0001', bg3:'#3D0000', accent:'#D3A625', accentDim:'rgba(211,166,37,0.35)', glow:'rgba(211,166,37,0.55)', emoji:'🦁', pillBg:'rgba(116,0,1,0.6)' },
       hufflepuff:  { bg1:'#1C1000', bg2:'#4A2E00', bg3:'#6B4300', accent:'#ECB939', accentDim:'rgba(236,185,57,0.35)', glow:'rgba(236,185,57,0.55)', emoji:'🦡', pillBg:'rgba(90,65,0,0.6)' },
       ravenclaw:   { bg1:'#020510', bg2:'#0A1230', bg3:'#0E1A40', accent:'#A07840', accentDim:'rgba(160,120,64,0.35)', glow:'rgba(148,107,45,0.5)',  emoji:'🦅', pillBg:'rgba(14,26,64,0.7)' },
-      slytherin:   { bg1:'#030A06', bg2:'#0F2B18', bg3:'#1A472A', accent:'#B8B8B8', accentDim:'rgba(180,180,180,0.3)', glow:'rgba(150,200,150,0.35)',emoji:'🐍', pillBg:'rgba(26,71,42,0.7)' }
+      slytherin:   { bg1:'#030A06', bg2:'#0F2B18', bg3:'#1A472A', accent:'#B8B8B8', accentDim:'rgba(180,180,180,0.3)', glow:'rgba(150,200,150,0.35)',emoji:'���', pillBg:'rgba(26,71,42,0.7)' }
     };
     const hc = cfg[house];
     const lang = LANG.current;
