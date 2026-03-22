@@ -596,6 +596,44 @@
     letter-spacing: 0.3px;
   }
 
+  /* ── DOWNLOAD CARD BUTTON ── */
+  .download-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.45);
+    border-radius: 12px;
+    font-family: 'Kanit', 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: var(--gold-light);
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .download-btn:hover {
+    border-color: var(--gold-light);
+    background: rgba(201,168,76,0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(201,168,76,0.15);
+  }
+  .download-btn:active { transform: scale(0.98); }
+  .download-btn.loading { opacity: 0.6; pointer-events: none; }
+  .download-btn .dl-spinner {
+    display: none;
+    width: 15px; height: 15px;
+    border: 2px solid rgba(201,168,76,0.3);
+    border-top-color: var(--gold-light);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .download-btn.loading .dl-spinner { display: block; }
+  .download-btn.loading .dl-icon { display: none; }
+
   .retry-btn {
     width: 100%;
     padding: 14px;
@@ -1046,6 +1084,7 @@ function renderIntro() {
           </div>
         </div>
         <button class="start-btn" onclick="startQuiz()"><span>${tx.start}</span></button>
+        <div style="margin-top:20px;text-align:center;font-family:'Kanit','Cinzel',serif;font-size:11px;letter-spacing:2px;color:rgba(201,168,76,0.35);">✦ CREATED BY NUMCHAI NCS ✦</div>
       </div>
     </div>
   `;
@@ -1173,15 +1212,25 @@ function renderResult() {
           <p class="house-desc">${houseData.desc}</p>
 
           <div class="result-actions">
-            <button class="share-btn" id="share-btn-main" onclick="shareResult('${house}')">
+            <!-- ปุ่ม 1: ชวนมักเกิลมาเล่น = share link -->
+            <button class="share-btn" id="share-btn-main" onclick="inviteMuggles()">
               <div class="share-spinner"></div>
               <svg class="share-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                 <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
               </svg>
-              <span class="share-label">${LANG.current === 'th' ? 'แชร์ผลลัพธ์ของฉัน' : 'Share My Result'}</span>
+              <span class="share-label">${LANG.current === 'th' ? '🧙 ชวนพวกมักเกิลมาเล่นสิ' : '🧙 Invite Your Muggle Friends'}</span>
             </button>
-            <div class="ig-hint">${LANG.current === 'th' ? '📸 เลือก Instagram ใน share sheet เพื่อโพสต์ลง Stories ได้เลย' : '📸 Pick Instagram in the share sheet to post to Stories'}</div>
+            <!-- ปุ่ม 2: แชร์การ์ด = download image -->
+            <button class="download-btn" id="download-btn-main" onclick="downloadCard('${house}')">
+              <div class="dl-spinner"></div>
+              <svg class="dl-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              ${LANG.current === 'th' ? '📸 แชร์การ์ดของคุณ' : '📸 Save Your House Card'}
+            </button>
             <button class="retry-btn" onclick="retake()">${tx.retakeLabel}</button>
           </div>
         </div>
@@ -1682,9 +1731,9 @@ function showToast(icon, msg) {
 }
 
 // ─────────────────────────────────────────────
-// GENERATE RESULT CARD IMAGE (for IG Stories)
+// GENERATE RICH RESULT CARD (1080×1920 IG-ready)
 // ─────────────────────────────────────────────
-function generateResultCard(house) {
+function generateRichCard(house) {
   return new Promise(resolve => {
     const W = 1080, H = 1920;
     const c = document.createElement('canvas');
@@ -1692,273 +1741,261 @@ function generateResultCard(house) {
     const ctx = c.getContext('2d');
 
     const cfg = {
-      gryffindor: { bg1:'#3D0000', bg2:'#740001', bg3:'#1A0000', accent:'#D3A625', glow:'rgba(211,166,37,0.6)', emoji:'🦁' },
-      hufflepuff:  { bg1:'#2A1800', bg2:'#5C3A00', bg3:'#ECB939', accent:'#ECB939', glow:'rgba(236,185,57,0.6)', emoji:'🦡' },
-      ravenclaw:   { bg1:'#020510', bg2:'#0E1A40', bg3:'#050B1E', accent:'#946B2D', glow:'rgba(148,107,45,0.5)', emoji:'🦅' },
-      slytherin:   { bg1:'#040D08', bg2:'#1A472A', bg3:'#081B10', accent:'#AAAAAA', glow:'rgba(170,170,170,0.4)', emoji:'🐍' }
+      gryffindor: { bg1:'#1A0000', bg2:'#5A0001', bg3:'#3D0000', accent:'#D3A625', accentDim:'rgba(211,166,37,0.35)', glow:'rgba(211,166,37,0.55)', emoji:'🦁', pillBg:'rgba(116,0,1,0.6)' },
+      hufflepuff:  { bg1:'#1C1000', bg2:'#4A2E00', bg3:'#6B4300', accent:'#ECB939', accentDim:'rgba(236,185,57,0.35)', glow:'rgba(236,185,57,0.55)', emoji:'🦡', pillBg:'rgba(90,65,0,0.6)' },
+      ravenclaw:   { bg1:'#020510', bg2:'#0A1230', bg3:'#0E1A40', accent:'#A07840', accentDim:'rgba(160,120,64,0.35)', glow:'rgba(148,107,45,0.5)',  emoji:'🦅', pillBg:'rgba(14,26,64,0.7)' },
+      slytherin:   { bg1:'#030A06', bg2:'#0F2B18', bg3:'#1A472A', accent:'#B8B8B8', accentDim:'rgba(180,180,180,0.3)', glow:'rgba(150,200,150,0.35)',emoji:'🐍', pillBg:'rgba(26,71,42,0.7)' }
     };
     const hc = cfg[house];
+    const lang = LANG.current;
+    const tx = TEXT[lang];
+    const houseData = tx.houses[house];
+    const traits = tx.traits[house];
 
-    // ── Background gradient ──
-    const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+    // ── 1. Background ──────────────────────────────
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
     bgGrad.addColorStop(0,   hc.bg1);
-    bgGrad.addColorStop(0.5, hc.bg2);
+    bgGrad.addColorStop(0.4, hc.bg2);
     bgGrad.addColorStop(1,   hc.bg3);
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // ── Radial center glow ──
-    const glow = ctx.createRadialGradient(W/2, H*0.45, 0, W/2, H*0.45, W*0.7);
+    // radial glow center
+    const glow = ctx.createRadialGradient(W/2, H*0.38, 0, W/2, H*0.38, W*0.75);
     glow.addColorStop(0, hc.glow);
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, H);
 
-    // ── Draw scattered stars ──
+    // ── 2. Stars ──────────────────────────────────
     ctx.save();
-    for (let i = 0; i < 220; i++) {
-      const sx = Math.random() * W;
-      const sy = Math.random() * H;
-      const sr = Math.random() * 2 + 0.5;
-      const sa = Math.random() * 0.7 + 0.1;
-      ctx.globalAlpha = sa;
-      ctx.fillStyle = '#F0D080';
-      ctx.beginPath();
-      ctx.arc(sx, sy, sr, 0, Math.PI*2);
-      ctx.fill();
+    for (let i = 0; i < 260; i++) {
+      const sx = Math.random() * W, sy = Math.random() * H;
+      const sr = Math.random() * 2 + 0.3;
+      ctx.globalAlpha = Math.random() * 0.65 + 0.1;
+      ctx.fillStyle = '#F5E8C8';
+      ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI*2); ctx.fill();
     }
     ctx.restore();
 
-    // ── Decorative border ──
+    // ── 3. Outer border frames ─────────────────────
     ctx.save();
-    ctx.strokeStyle = hc.accent;
-    ctx.lineWidth = 6;
-    ctx.globalAlpha = 0.5;
-    ctx.strokeRect(48, 48, W - 96, H - 96);
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.25;
-    ctx.strokeRect(64, 64, W - 128, H - 128);
+    ctx.strokeStyle = hc.accent; ctx.lineWidth = 5; ctx.globalAlpha = 0.45;
+    ctx.strokeRect(44, 44, W-88, H-88);
+    ctx.lineWidth = 1.5; ctx.globalAlpha = 0.2;
+    ctx.strokeRect(60, 60, W-120, H-120);
     ctx.restore();
 
-    // ── Corner ornaments ──
-    const corners = [[80,80],[W-80,80],[80,H-80],[W-80,H-80]];
+    // ── 4. Corner ✦ ────────────────────────────────
     ctx.save();
-    ctx.fillStyle = hc.accent;
-    ctx.globalAlpha = 0.6;
-    ctx.font = '56px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    corners.forEach(([cx,cy]) => ctx.fillText('✦', cx, cy));
+    ctx.fillStyle = hc.accent; ctx.font = '52px serif'; ctx.globalAlpha = 0.55; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    [[80,80],[W-80,80],[80,H-80],[W-80,H-80]].forEach(([x,y]) => ctx.fillText('✦',x,y));
     ctx.restore();
 
-    // ── Hogwarts subtitle ──
-    ctx.save();
-    ctx.globalAlpha = 0.55;
-    ctx.fillStyle = hc.accent;
-    ctx.font = '500 38px "Arial Narrow", Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.letterSpacing = '8px';
-    ctx.fillText('HOGWARTS SORTING', W/2, 200);
-    ctx.restore();
+    // helper: draw text with optional shadow
+    function drawText(text, x, y, font, color, alpha=1, shadowBlur=0, shadowColor='') {
+      ctx.save();
+      ctx.font = font; ctx.fillStyle = color; ctx.globalAlpha = alpha;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      if (shadowBlur) { ctx.shadowColor = shadowColor||color; ctx.shadowBlur = shadowBlur; }
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
 
-    // ── Ornament line ──
-    ctx.save();
-    ctx.strokeStyle = hc.accent;
-    ctx.globalAlpha = 0.35;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(120, 240); ctx.lineTo(W - 120, 240);
-    ctx.stroke();
-    ctx.restore();
+    // helper: wrap text into lines
+    function wrapText(text, maxWidth, font) {
+      ctx.save(); ctx.font = font;
+      const words = text.split(' ');
+      const lines = []; let line = '';
+      for (const w of words) {
+        const test = line ? line+' '+w : w;
+        if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+        else line = test;
+      }
+      if (line) lines.push(line);
+      ctx.restore();
+      return lines;
+    }
 
-    // ── "THE SORTING HAT DECLARES" ──
-    ctx.save();
-    ctx.globalAlpha = 0.6;
-    ctx.fillStyle = hc.accent;
-    ctx.font = '36px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('✦  THE SORTING HAT DECLARES  ✦', W/2, 290);
-    ctx.restore();
+    // ── 5. Top label ───────────────────────────────
+    drawText('HOGWARTS SORTING', W/2, 185, 'bold 40px Arial Narrow, Arial, sans-serif', hc.accent, 0.5);
 
-    // ── House emoji (large) ──
-    ctx.save();
-    ctx.font = '320px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    // glow shadow
-    ctx.shadowColor = hc.accent;
-    ctx.shadowBlur = 80;
-    ctx.globalAlpha = 1;
-    ctx.fillText(hc.emoji, W/2, H * 0.42);
-    ctx.restore();
+    // thin rule
+    ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.25; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(130,225); ctx.lineTo(W-130,225); ctx.stroke(); ctx.restore();
 
-    // ── House name ──
-    const houseDisplayNames = {
-      en: { gryffindor:'GRYFFINDOR', hufflepuff:'HUFFLEPUFF', ravenclaw:'RAVENCLAW', slytherin:'SLYTHERIN' },
-      th: { gryffindor:'กริฟฟินดอร์', hufflepuff:'ฮัฟเฟิลพัฟฟ์', ravenclaw:'เรเวนคลอว์', slytherin:'สลิธีรีน' }
+    drawText('✦  THE SORTING HAT DECLARES  ✦', W/2, 270, '36px Arial, sans-serif', hc.accent, 0.55);
+
+    // ── 6. House Emoji ─────────────────────────────
+    drawText(hc.emoji, W/2, 560, '290px serif', '#fff', 1, 60, hc.accent);
+
+    // ── 7. House Name ──────────────────────────────
+    const houseNames = {
+      en:{ gryffindor:'GRYFFINDOR', hufflepuff:'HUFFLEPUFF', ravenclaw:'RAVENCLAW', slytherin:'SLYTHERIN' },
+      th:{ gryffindor:'กริฟฟินดอร์', hufflepuff:'ฮัฟเฟิลพัฟฟ์', ravenclaw:'เรเวนคลอว์', slytherin:'สลิธีรีน' }
     };
-    const displayName = houseDisplayNames[LANG.current][house];
-    ctx.save();
-    ctx.fillStyle = hc.accent;
-    ctx.font = `bold ${LANG.current==='th'?'108':'96'}px ${LANG.current==='th'?'Arial, sans-serif':'Arial Narrow, Arial, sans-serif'}`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = hc.accent;
-    ctx.shadowBlur = 40;
-    ctx.fillText(displayName, W/2, H * 0.62);
+    const nameFontSize = lang==='th' ? 100 : 92;
+    const nameFont = lang==='th'
+      ? `bold ${nameFontSize}px Arial, sans-serif`
+      : `bold ${nameFontSize}px Arial Narrow, Arial, sans-serif`;
+    drawText(houseNames[lang][house], W/2, 800, nameFont, hc.accent, 1, 36, hc.accent);
+
+    // ── 8. Motto ───────────────────────────────────
+    drawText(`"${houseData.motto}"`, W/2, 910,
+      `italic 46px ${lang==='th'?'Arial':'Georgia'}, serif`, 'rgba(245,232,200,0.72)', 1);
+
+    // ── 9. Divider ────────────────────────────────
+    ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.25; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(150,975); ctx.lineTo(W-150,975); ctx.stroke();
+    drawText('⟡', W/2, 975, '42px serif', hc.accent, 0.55);
     ctx.restore();
 
-    // ── Motto ──
-    const mottos = {
-      gryffindor: { en: '"Brave of Heart, Strong of Soul"',      th: '"กล้าหาญ มีหัวใจ แข็งแกร่ง"' },
-      hufflepuff:  { en: '"Loyal, Patient, True"',                th: '"ซื่อสัตย์ อดทน และจริงใจ"' },
-      ravenclaw:   { en: '"Wit, Wisdom, Wonder"',                 th: '"ปัญญา ความรู้ ความสงสัยใคร่รู้"' },
-      slytherin:   { en: '"Ambitious, Cunning, Proud"',           th: '"ทะเยอทะยาน แยบยล และภาคภูมิใจ"' }
-    };
-    ctx.save();
-    ctx.fillStyle = 'rgba(245,232,200,0.7)';
-    ctx.font = `italic 52px ${LANG.current==='th'?'Arial':'Georgia'}, serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(mottos[house][LANG.current], W/2, H * 0.72);
+    // ── 10. Traits pills ──────────────────────────
+    const PILL_H = 64, PILL_R = 32, PILL_GAP = 18;
+    const pillFont = `500 34px ${lang==='th'?'Arial':'Arial Narrow'}, Arial, sans-serif`;
+    ctx.save(); ctx.font = pillFont;
+    const pillWidths = traits.map(tr => ctx.measureText(tr).width + 56);
+    const totalPillW = pillWidths.reduce((a,b)=>a+b,0) + PILL_GAP*(traits.length-1);
+    let px = (W - totalPillW) / 2;
+    const py = 1030;
+    traits.forEach((tr, i) => {
+      const pw = pillWidths[i];
+      // pill bg
+      ctx.save();
+      ctx.fillStyle = hc.pillBg; ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.roundRect(px, py - PILL_H/2, pw, PILL_H, PILL_R);
+      ctx.fill();
+      ctx.strokeStyle = hc.accent; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+      ctx.stroke();
+      ctx.restore();
+      // text
+      ctx.save();
+      ctx.font = pillFont; ctx.fillStyle = hc.accent; ctx.globalAlpha = 0.95;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(tr, px + pw/2, py);
+      ctx.restore();
+      px += pw + PILL_GAP;
+    });
     ctx.restore();
 
-    // ── Ornament divider ──
-    ctx.save();
-    ctx.strokeStyle = hc.accent;
-    ctx.globalAlpha = 0.3;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(160, H*0.79); ctx.lineTo(W-160, H*0.79);
-    ctx.stroke();
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = hc.accent;
-    ctx.font = '40px serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('⟡', W/2, H*0.79);
+    // ── 11. Thin rule ─────────────────────────────
+    ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.18; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(130,1100); ctx.lineTo(W-130,1100); ctx.stroke(); ctx.restore();
+
+    // ── 12. Description ───────────────────────────
+    const descFont = `${lang==='th'?'400':'normal'} 40px ${lang==='th'?'Arial':'Georgia'}, serif`;
+    const descLines = wrapText(houseData.desc, W - 200, descFont);
+    ctx.save(); ctx.font = descFont; ctx.fillStyle = 'rgba(245,232,200,0.8)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.globalAlpha = 1;
+    const descLineH = lang==='th' ? 62 : 56;
+    const descStartY = 1125;
+    descLines.forEach((line, i) => {
+      ctx.fillText(line, W/2, descStartY + i * descLineH);
+    });
     ctx.restore();
 
-    // ── CTA ──
-    ctx.save();
-    ctx.globalAlpha = 0.55;
-    ctx.fillStyle = hc.accent;
-    ctx.font = '40px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(LANG.current==='th'
-      ? 'มาลองดูคุณได้บ้านไหน 🎩'
-      : 'Find your house at hogwarts-quiz.vercel.app 🎩',
-      W/2, H*0.86
-    );
+    // ── 13. Bottom divider ────────────────────────
+    const divY = H - 260;
+    ctx.save(); ctx.strokeStyle = hc.accent; ctx.globalAlpha = 0.25; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(130, divY); ctx.lineTo(W-130, divY); ctx.stroke();
+    drawText('✦', W/2, divY, '36px serif', hc.accent, 0.45);
     ctx.restore();
 
-    // ── Bottom hashtag / url ──
-    ctx.save();
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = '#F5E8C8';
-    ctx.font = '34px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('#HogwartsQuiz  #Wizarding  #Sorting', W/2, H*0.91);
-    ctx.restore();
+    // ── 14. CTA url ───────────────────────────────
+    drawText('🎩 hogwarts-quiz-ivory.vercel.app', W/2, H-195,
+      '40px Arial, sans-serif', hc.accent, 0.55);
+
+    // ── 15. Hashtags ──────────────────────────────
+    drawText('#HogwartsQuiz  #WizardingWorld  #SortingHat', W/2, H-130,
+      '32px Arial, sans-serif', 'rgba(245,232,200,0.35)', 1);
+
+    // ── 16. Created by ────────────────────────────
+    drawText('Created by Numchai Ncs', W/2, H-68,
+      '28px Arial, sans-serif', hc.accent, 0.38);
 
     resolve(c);
   });
 }
 
 // ─────────────────────────────────────────────
-// SHARE
+// INVITE MUGGLES — share quiz link
 // ─────────────────────────────────────────────
-async function shareResult(house) {
-  const btn = document.getElementById('share-btn-main');
+async function inviteMuggles() {
+  const QUIZ_URL = 'https://hogwarts-quiz-ivory.vercel.app/';
+  const shareText = LANG.current === 'th'
+    ? '🎩 มาลองดูกันสิว่าคุณจะได้อยู่บ้านไหนในฮอกวอตส์!'
+    : '🎩 Find out which Hogwarts house you belong to!';
 
-  // Show loading state
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Hogwarts Sorting Quiz', text: shareText, url: QUIZ_URL });
+      return;
+    } catch(e) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  // fallback: copy link
+  try {
+    await navigator.clipboard.writeText(QUIZ_URL);
+    showToast('🧙', LANG.current === 'th' ? 'คัดลอกลิ้งค์แล้ว! ส่งให้มักเกิลได้เลย' : 'Link copied! Send it to your muggle friends');
+  } catch {
+    window.prompt('Copy this link:', QUIZ_URL);
+  }
+}
+
+// ─────────────────────────────────────────────
+// DOWNLOAD CARD — rich image with traits + desc
+// ─────────────────────────────────────────────
+async function downloadCard(house) {
+  const btn = document.getElementById('download-btn-main');
   if (btn) {
     btn.classList.add('loading');
-    btn.querySelector('.share-label').textContent =
-      LANG.current === 'th' ? 'กำลังสร้างรูป...' : 'Preparing image...';
+    btn.querySelector('span') && (btn.querySelector('span').textContent =
+      LANG.current === 'th' ? 'กำลังสร้างการ์ด...' : 'Creating card...');
   }
 
-  const houseNames = {
-    en: { gryffindor:'Gryffindor', hufflepuff:'Hufflepuff', ravenclaw:'Ravenclaw', slytherin:'Slytherin' },
-    th: { gryffindor:'กริฟฟินดอร์', hufflepuff:'ฮัฟเฟิลพัฟฟ์', ravenclaw:'เรเวนคลอว์', slytherin:'สลิธีรีน' }
-  };
-  const emojis = { gryffindor:'🦁', hufflepuff:'🦡', ravenclaw:'🦅', slytherin:'🐍' };
-  const name = houseNames[LANG.current][house];
-  const emoji = emojis[house];
-  const url = window.location.href;
-  const shareText = LANG.current === 'th'
-    ? `${emoji} ฉันได้บ้าน "${name}" ในโรงเรียนฮอกวอตส์! มาลองดูคุณได้บ้านไหน 🎩✨`
-    : `${emoji} I got sorted into "${name}" at Hogwarts! Find out which house you belong to 🎩✨`;
-
-  // Reset button helper
   function resetBtn() {
     if (!btn) return;
     btn.classList.remove('loading');
-    btn.querySelector('.share-label').textContent =
-      LANG.current === 'th' ? 'แชร์ผลลัพธ์ของฉัน' : 'Share My Result';
+    const sp = btn.querySelector('span');
+    if (sp) sp.textContent = LANG.current === 'th' ? '📸 แชร์การ์ดของคุณ' : '📸 Save Your House Card';
   }
 
   try {
-    // ── Generate card image ──
-    const canvas = await generateResultCard(house);
-
-    // Convert canvas → Blob → File
+    const canvas = await generateRichCard(house);
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-    const file = new File([blob], `hogwarts-${house}.png`, { type: 'image/png' });
+    const file = new File([blob], `hogwarts-${house}-card.png`, { type: 'image/png' });
 
-    // ── Try native share WITH image (iOS/Android → IG Stories option) ──
+    // iOS/Android: native share with image → IG Stories option
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       resetBtn();
       try {
         await navigator.share({
           files: [file],
           title: 'Hogwarts Sorting Quiz',
-          text: shareText
+          text: LANG.current === 'th'
+            ? `ฉันได้บ้าน ${TEXT[LANG.current].houses[house].name} ในฮอกวอตส์! 🎩`
+            : `I got sorted into ${TEXT.en.houses[house].name} at Hogwarts! 🎩`
         });
         return;
       } catch(e) {
-        if (e.name === 'AbortError') return; // user dismissed
+        if (e.name === 'AbortError') { resetBtn(); return; }
       }
     }
 
-    // ── Fallback: native share without file ──
-    if (navigator.share) {
-      resetBtn();
-      try {
-        await navigator.share({ title: 'Hogwarts Sorting Quiz', text: shareText, url });
-        return;
-      } catch(e) {
-        if (e.name === 'AbortError') return;
-      }
-    }
-
-    // ── Desktop fallback: download image + copy link ──
+    // Desktop / fallback: direct download
     resetBtn();
-    // Download the card
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `hogwarts-${house}-result.png`;
+    a.download = `hogwarts-${house}-card.png`;
     a.click();
     URL.revokeObjectURL(a.href);
-    // Copy link
-    try {
-      await navigator.clipboard.writeText(`${shareText}\n${url}`);
-      showToast('📥', LANG.current === 'th'
-        ? 'ดาวน์โหลดรูปแล้ว + คัดลอกลิ้งค์แล้ว!'
-        : 'Image downloaded + link copied!');
-    } catch {
-      showToast('📥', LANG.current === 'th' ? 'ดาวน์โหลดรูปแล้ว!' : 'Image downloaded!');
-    }
+    showToast('📸', LANG.current === 'th' ? 'บันทึกการ์ดลงเครื่องแล้ว!' : 'Card saved to your device!');
 
   } catch(err) {
     resetBtn();
-    // Last resort: just copy link
-    try {
-      await navigator.clipboard.writeText(`${shareText}\n${url}`);
-      showToast('✦', LANG.current === 'th' ? 'คัดลอกลิ้งค์แล้ว!' : 'Link copied!');
-    } catch {
-      window.prompt('Copy this link:', url);
-    }
+    showToast('⚠️', LANG.current === 'th' ? 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง' : 'Something went wrong, please try again');
   }
 }
 
