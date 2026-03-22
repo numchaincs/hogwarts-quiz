@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hogwarts Sorting Quiz</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Sarabun:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
     --gold: #C9A84C;
@@ -27,7 +27,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-family: 'Crimson Text', 'Kanit', serif;
     background: var(--bg-deep);
     color: var(--parchment);
     min-height: 100vh;
@@ -211,7 +211,7 @@
     to { transform: scale(1) rotate(0deg); opacity: 1; }
   }
   .question-text {
-    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-family: 'Crimson Text', 'Kanit', serif;
     font-size: 20px;
     line-height: 1.5;
     text-align: center;
@@ -234,7 +234,7 @@
     padding: 14px 16px;
     cursor: pointer;
     color: var(--parchment);
-    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-family: 'Crimson Text', 'Kanit', serif;
     font-size: 16px;
     line-height: 1.4;
     text-align: left;
@@ -329,7 +329,7 @@
 
   /* ── INTRO SCREEN ── */
   .intro-desc {
-    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-family: 'Crimson Text', 'Kanit', serif;
     font-size: 18px;
     line-height: 1.7;
     text-align: center;
@@ -517,7 +517,7 @@
     border: 1px solid rgba(201,168,76,0.3);
     border-radius: 20px;
     padding: 6px 14px;
-    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-family: 'Crimson Text', 'Kanit', serif;
     font-size: 14px;
     color: var(--gold-light);
     animation: pillPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
@@ -528,7 +528,7 @@
   }
 
   .house-desc {
-    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-family: 'Crimson Text', 'Kanit', serif;
     font-size: 17px;
     line-height: 1.7;
     color: rgba(245,232,200,0.85);
@@ -536,21 +536,115 @@
     margin-bottom: 20px;
   }
 
+  /* ── SHARE + RETRY BUTTONS ── */
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .share-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08));
+    border: 1px solid rgba(201,168,76,0.6);
+    border-radius: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .share-btn:hover {
+    background: linear-gradient(135deg, rgba(201,168,76,0.3), rgba(201,168,76,0.15));
+    border-color: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201,168,76,0.25);
+  }
+  .share-btn:active { transform: scale(0.98); }
+  .share-btn svg { flex-shrink: 0; }
+  .share-btn.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    cursor: default;
+  }
+  .share-btn .share-spinner {
+    display: none;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(201,168,76,0.3);
+    border-top-color: var(--gold-light);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  .share-btn.loading .share-spinner { display: block; }
+  .share-btn.loading .share-icon { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .ig-hint {
+    font-family: 'Kanit', serif;
+    font-size: 11px;
+    color: rgba(245,232,200,0.4);
+    text-align: center;
+    margin-top: -2px;
+    letter-spacing: 0.3px;
+  }
+
   .retry-btn {
     width: 100%;
     padding: 14px;
     background: transparent;
-    border: 1px solid rgba(201,168,76,0.4);
+    border: 1px solid rgba(201,168,76,0.25);
     border-radius: 12px;
     font-family: 'Cinzel', serif;
     font-size: 12px;
     letter-spacing: 2px;
-    color: var(--gold);
+    color: rgba(201,168,76,0.6);
     cursor: pointer;
     transition: all 0.3s;
     text-transform: uppercase;
   }
-  .retry-btn:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .retry-btn:hover { border-color: rgba(201,168,76,0.5); color: var(--gold); background: rgba(201,168,76,0.05); }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(20,16,36,0.96);
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 40px;
+    padding: 12px 24px;
+    font-family: 'Kanit', 'Crimson Text', serif;
+    font-size: 14px;
+    color: var(--gold-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(201,168,76,0.15);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  #toast.hide {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
 
   /* ── ORNAMENT DIVIDER ── */
   .ornament {
@@ -634,6 +728,7 @@
 <body>
 
 <canvas id="stars-canvas"></canvas>
+<div id="toast"></div>
 <button id="lang-btn">TH / EN</button>
 <div id="app"></div>
 
@@ -1077,7 +1172,18 @@ function renderResult() {
 
           <p class="house-desc">${houseData.desc}</p>
 
-          <button class="retry-btn" onclick="retake()">${tx.retakeLabel}</button>
+          <div class="result-actions">
+            <button class="share-btn" id="share-btn-main" onclick="shareResult('${house}')">
+              <div class="share-spinner"></div>
+              <svg class="share-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              <span class="share-label">${LANG.current === 'th' ? 'แชร์ผลลัพธ์ของฉัน' : 'Share My Result'}</span>
+            </button>
+            <div class="ig-hint">${LANG.current === 'th' ? '📸 เลือก Instagram ใน share sheet เพื่อโพสต์ลง Stories ได้เลย' : '📸 Pick Instagram in the share sheet to post to Stories'}</div>
+            <button class="retry-btn" onclick="retake()">${tx.retakeLabel}</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1558,6 +1664,305 @@ function nextQuestion() {
   }
 }
 
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+let toastTimer = null;
+function showToast(icon, msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  el.classList.remove('hide');
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.classList.remove('show');
+    el.classList.add('hide');
+  }, 3000);
+}
+
+// ─────────────────────────────────────────────
+// GENERATE RESULT CARD IMAGE (for IG Stories)
+// ─────────────────────────────────────────────
+function generateResultCard(house) {
+  return new Promise(resolve => {
+    const W = 1080, H = 1920;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d');
+
+    const cfg = {
+      gryffindor: { bg1:'#3D0000', bg2:'#740001', bg3:'#1A0000', accent:'#D3A625', glow:'rgba(211,166,37,0.6)', emoji:'🦁' },
+      hufflepuff:  { bg1:'#2A1800', bg2:'#5C3A00', bg3:'#ECB939', accent:'#ECB939', glow:'rgba(236,185,57,0.6)', emoji:'🦡' },
+      ravenclaw:   { bg1:'#020510', bg2:'#0E1A40', bg3:'#050B1E', accent:'#946B2D', glow:'rgba(148,107,45,0.5)', emoji:'🦅' },
+      slytherin:   { bg1:'#040D08', bg2:'#1A472A', bg3:'#081B10', accent:'#AAAAAA', glow:'rgba(170,170,170,0.4)', emoji:'🐍' }
+    };
+    const hc = cfg[house];
+
+    // ── Background gradient ──
+    const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+    bgGrad.addColorStop(0,   hc.bg1);
+    bgGrad.addColorStop(0.5, hc.bg2);
+    bgGrad.addColorStop(1,   hc.bg3);
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── Radial center glow ──
+    const glow = ctx.createRadialGradient(W/2, H*0.45, 0, W/2, H*0.45, W*0.7);
+    glow.addColorStop(0, hc.glow);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── Draw scattered stars ──
+    ctx.save();
+    for (let i = 0; i < 220; i++) {
+      const sx = Math.random() * W;
+      const sy = Math.random() * H;
+      const sr = Math.random() * 2 + 0.5;
+      const sa = Math.random() * 0.7 + 0.1;
+      ctx.globalAlpha = sa;
+      ctx.fillStyle = '#F0D080';
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // ── Decorative border ──
+    ctx.save();
+    ctx.strokeStyle = hc.accent;
+    ctx.lineWidth = 6;
+    ctx.globalAlpha = 0.5;
+    ctx.strokeRect(48, 48, W - 96, H - 96);
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.25;
+    ctx.strokeRect(64, 64, W - 128, H - 128);
+    ctx.restore();
+
+    // ── Corner ornaments ──
+    const corners = [[80,80],[W-80,80],[80,H-80],[W-80,H-80]];
+    ctx.save();
+    ctx.fillStyle = hc.accent;
+    ctx.globalAlpha = 0.6;
+    ctx.font = '56px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    corners.forEach(([cx,cy]) => ctx.fillText('✦', cx, cy));
+    ctx.restore();
+
+    // ── Hogwarts subtitle ──
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = hc.accent;
+    ctx.font = '500 38px "Arial Narrow", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('HOGWARTS SORTING', W/2, 200);
+    ctx.restore();
+
+    // ── Ornament line ──
+    ctx.save();
+    ctx.strokeStyle = hc.accent;
+    ctx.globalAlpha = 0.35;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(120, 240); ctx.lineTo(W - 120, 240);
+    ctx.stroke();
+    ctx.restore();
+
+    // ── "THE SORTING HAT DECLARES" ──
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = hc.accent;
+    ctx.font = '36px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✦  THE SORTING HAT DECLARES  ✦', W/2, 290);
+    ctx.restore();
+
+    // ── House emoji (large) ──
+    ctx.save();
+    ctx.font = '320px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // glow shadow
+    ctx.shadowColor = hc.accent;
+    ctx.shadowBlur = 80;
+    ctx.globalAlpha = 1;
+    ctx.fillText(hc.emoji, W/2, H * 0.42);
+    ctx.restore();
+
+    // ── House name ──
+    const houseDisplayNames = {
+      en: { gryffindor:'GRYFFINDOR', hufflepuff:'HUFFLEPUFF', ravenclaw:'RAVENCLAW', slytherin:'SLYTHERIN' },
+      th: { gryffindor:'กริฟฟินดอร์', hufflepuff:'ฮัฟเฟิลพัฟฟ์', ravenclaw:'เรเวนคลอว์', slytherin:'สลิธีรีน' }
+    };
+    const displayName = houseDisplayNames[LANG.current][house];
+    ctx.save();
+    ctx.fillStyle = hc.accent;
+    ctx.font = `bold ${LANG.current==='th'?'108':'96'}px ${LANG.current==='th'?'Arial, sans-serif':'Arial Narrow, Arial, sans-serif'}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = hc.accent;
+    ctx.shadowBlur = 40;
+    ctx.fillText(displayName, W/2, H * 0.62);
+    ctx.restore();
+
+    // ── Motto ──
+    const mottos = {
+      gryffindor: { en: '"Brave of Heart, Strong of Soul"',      th: '"กล้าหาญ มีหัวใจ แข็งแกร่ง"' },
+      hufflepuff:  { en: '"Loyal, Patient, True"',                th: '"ซื่อสัตย์ อดทน และจริงใจ"' },
+      ravenclaw:   { en: '"Wit, Wisdom, Wonder"',                 th: '"ปัญญา ความรู้ ความสงสัยใคร่รู้"' },
+      slytherin:   { en: '"Ambitious, Cunning, Proud"',           th: '"ทะเยอทะยาน แยบยล และภาคภูมิใจ"' }
+    };
+    ctx.save();
+    ctx.fillStyle = 'rgba(245,232,200,0.7)';
+    ctx.font = `italic 52px ${LANG.current==='th'?'Arial':'Georgia'}, serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(mottos[house][LANG.current], W/2, H * 0.72);
+    ctx.restore();
+
+    // ── Ornament divider ──
+    ctx.save();
+    ctx.strokeStyle = hc.accent;
+    ctx.globalAlpha = 0.3;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(160, H*0.79); ctx.lineTo(W-160, H*0.79);
+    ctx.stroke();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = hc.accent;
+    ctx.font = '40px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⟡', W/2, H*0.79);
+    ctx.restore();
+
+    // ── CTA ──
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = hc.accent;
+    ctx.font = '40px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(LANG.current==='th'
+      ? 'มาลองดูคุณได้บ้านไหน 🎩'
+      : 'Find your house at hogwarts-quiz.vercel.app 🎩',
+      W/2, H*0.86
+    );
+    ctx.restore();
+
+    // ── Bottom hashtag / url ──
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = '#F5E8C8';
+    ctx.font = '34px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('#HogwartsQuiz  #Wizarding  #Sorting', W/2, H*0.91);
+    ctx.restore();
+
+    resolve(c);
+  });
+}
+
+// ─────────────────────────────────────────────
+// SHARE
+// ─────────────────────────────────────────────
+async function shareResult(house) {
+  const btn = document.getElementById('share-btn-main');
+
+  // Show loading state
+  if (btn) {
+    btn.classList.add('loading');
+    btn.querySelector('.share-label').textContent =
+      LANG.current === 'th' ? 'กำลังสร้างรูป...' : 'Preparing image...';
+  }
+
+  const houseNames = {
+    en: { gryffindor:'Gryffindor', hufflepuff:'Hufflepuff', ravenclaw:'Ravenclaw', slytherin:'Slytherin' },
+    th: { gryffindor:'กริฟฟินดอร์', hufflepuff:'ฮัฟเฟิลพัฟฟ์', ravenclaw:'เรเวนคลอว์', slytherin:'สลิธีรีน' }
+  };
+  const emojis = { gryffindor:'🦁', hufflepuff:'🦡', ravenclaw:'🦅', slytherin:'🐍' };
+  const name = houseNames[LANG.current][house];
+  const emoji = emojis[house];
+  const url = window.location.href;
+  const shareText = LANG.current === 'th'
+    ? `${emoji} ฉันได้บ้าน "${name}" ในโรงเรียนฮอกวอตส์! มาลองดูคุณได้บ้านไหน 🎩✨`
+    : `${emoji} I got sorted into "${name}" at Hogwarts! Find out which house you belong to 🎩✨`;
+
+  // Reset button helper
+  function resetBtn() {
+    if (!btn) return;
+    btn.classList.remove('loading');
+    btn.querySelector('.share-label').textContent =
+      LANG.current === 'th' ? 'แชร์ผลลัพธ์ของฉัน' : 'Share My Result';
+  }
+
+  try {
+    // ── Generate card image ──
+    const canvas = await generateResultCard(house);
+
+    // Convert canvas → Blob → File
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    const file = new File([blob], `hogwarts-${house}.png`, { type: 'image/png' });
+
+    // ── Try native share WITH image (iOS/Android → IG Stories option) ──
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      resetBtn();
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Hogwarts Sorting Quiz',
+          text: shareText
+        });
+        return;
+      } catch(e) {
+        if (e.name === 'AbortError') return; // user dismissed
+      }
+    }
+
+    // ── Fallback: native share without file ──
+    if (navigator.share) {
+      resetBtn();
+      try {
+        await navigator.share({ title: 'Hogwarts Sorting Quiz', text: shareText, url });
+        return;
+      } catch(e) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+
+    // ── Desktop fallback: download image + copy link ──
+    resetBtn();
+    // Download the card
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `hogwarts-${house}-result.png`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    // Copy link
+    try {
+      await navigator.clipboard.writeText(`${shareText}\n${url}`);
+      showToast('📥', LANG.current === 'th'
+        ? 'ดาวน์โหลดรูปแล้ว + คัดลอกลิ้งค์แล้ว!'
+        : 'Image downloaded + link copied!');
+    } catch {
+      showToast('📥', LANG.current === 'th' ? 'ดาวน์โหลดรูปแล้ว!' : 'Image downloaded!');
+    }
+
+  } catch(err) {
+    resetBtn();
+    // Last resort: just copy link
+    try {
+      await navigator.clipboard.writeText(`${shareText}\n${url}`);
+      showToast('✦', LANG.current === 'th' ? 'คัดลอกลิ้งค์แล้ว!' : 'Link copied!');
+    } catch {
+      window.prompt('Copy this link:', url);
+    }
+  }
+}
+
+
 function retake() {
   if (particleAnimId) { cancelAnimationFrame(particleAnimId); particleAnimId = null; }
   state = { screen: 'intro', currentQ: 0, selected: null, answers: [], scores: { gryffindor:0, hufflepuff:0, ravenclaw:0, slytherin:0 }, result: null };
@@ -1572,8 +1977,8 @@ document.getElementById('lang-btn').addEventListener('click', () => {
   document.getElementById('lang-btn').textContent = LANG.current === 'en' ? 'TH / EN' : 'EN / TH';
   // Update body font for Thai
   document.body.style.fontFamily = LANG.current === 'th'
-    ? "'Sarabun', 'Crimson Text', serif"
-    : "'Crimson Text', 'Sarabun', serif";
+    ? "'Kanit', 'Crimson Text', serif"
+    : "'Crimson Text', 'Kanit', serif";
   render();
 });
 
