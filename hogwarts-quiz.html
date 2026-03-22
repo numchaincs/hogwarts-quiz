@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hogwarts Sorting Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Sarabun:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #F0D080;
+    --gold-dark: #8B6914;
+    --parchment: #F5E8C8;
+    --ink: #1A0F00;
+    --bg-deep: #0A0812;
+    --bg-mid: #100E1A;
+    --gryffindor-primary: #740001;
+    --gryffindor-accent: #D3A625;
+    --hufflepuff-primary: #ECB939;
+    --hufflepuff-accent: #372E29;
+    --ravenclaw-primary: #0E1A40;
+    --ravenclaw-accent: #946B2D;
+    --slytherin-primary: #1A472A;
+    --slytherin-accent: #AAAAAA;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Crimson Text', 'Sarabun', serif;
+    background: var(--bg-deep);
+    color: var(--parchment);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── STARS ── */
+  #stars-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── FLOATING PARTICLES ── */
+  .particle {
+    position: fixed;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    animation: floatUp 8s infinite;
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+  }
+
+  /* ── LANG TOGGLE ── */
+  #lang-btn {
+    position: fixed;
+    top: 16px; right: 16px;
+    z-index: 100;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s;
+  }
+  #lang-btn:hover {
+    background: var(--gold);
+    color: var(--bg-deep);
+  }
+
+  /* ── MAIN WRAPPER ── */
+  #app {
+    position: relative;
+    z-index: 10;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── LOGO / CREST ── */
+  .crest-svg {
+    width: 90px; height: 90px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 20px rgba(201,168,76,0.5));
+    animation: floatBob 4s ease-in-out infinite;
+  }
+  @keyframes floatBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .title-block { text-align: center; margin-bottom: 24px; }
+  .title-en {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(18px, 5vw, 26px);
+    color: var(--gold-light);
+    text-shadow: 0 0 30px rgba(201,168,76,0.6);
+    line-height: 1.2;
+  }
+  .title-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold-dark);
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ── CARD ── */
+  .card {
+    width: 100%;
+    background: linear-gradient(145deg, rgba(20,16,36,0.95), rgba(10,8,18,0.98));
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,168,76,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at center, rgba(201,168,76,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .progress-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold-dark);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .progress-bar-bg {
+    height: 6px;
+    background: rgba(201,168,76,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(201,168,76,0.5);
+  }
+  .progress-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .progress-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.4);
+    background: transparent;
+    transition: all 0.4s;
+  }
+  .progress-dot.active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  .progress-dot.done { background: var(--gold-dark); border-color: var(--gold-dark); }
+
+  /* ── QUESTION ── */
+  .question-num {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold-dark);
+    text-align: center;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .question-icon {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 12px;
+    display: block;
+    animation: iconPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes iconPop {
+    from { transform: scale(0) rotate(-10deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .question-text {
+    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-size: 20px;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--parchment);
+    margin-bottom: 24px;
+    min-height: 60px;
+  }
+
+  /* ── OPTIONS ── */
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-btn {
+    width: 100%;
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    color: var(--parchment);
+    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .option-btn:hover { border-color: var(--gold); transform: translateX(4px); }
+  .option-btn:hover::after { opacity: 1; }
+  .option-btn:active { transform: scale(0.98); }
+  .option-btn.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.12);
+    transform: translateX(0);
+  }
+  .option-letter {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+  .option-btn:hover .option-letter,
+  .option-btn.selected .option-letter {
+    background: var(--gold);
+    color: var(--bg-deep);
+    border-color: var(--gold);
+  }
+
+  /* ── NEXT BTN ── */
+  .next-btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-dark));
+    background-size: 200% 100%;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--bg-deep);
+    cursor: pointer;
+    transition: all 0.35s;
+    text-transform: uppercase;
+    opacity: 0;
+    pointer-events: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .next-btn.visible {
+    opacity: 1;
+    pointer-events: all;
+    animation: btnReveal 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes btnReveal {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .next-btn:hover { background-position: 100% 0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.4); }
+  .next-btn:active { transform: scale(0.98); }
+
+  /* ── SLIDE TRANSITION ── */
+  .slide-out-left {
+    animation: slideOutLeft 0.4s forwards;
+  }
+  .slide-in-right {
+    animation: slideInRight 0.4s forwards;
+  }
+  @keyframes slideOutLeft {
+    to { transform: translateX(-50px); opacity: 0; }
+  }
+  @keyframes slideInRight {
+    from { transform: translateX(50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* ── INTRO SCREEN ── */
+  .intro-desc {
+    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-size: 18px;
+    line-height: 1.7;
+    text-align: center;
+    color: rgba(245,232,200,0.8);
+    margin-bottom: 24px;
+  }
+  .intro-houses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .house-mini {
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 1px solid;
+    transition: transform 0.3s;
+  }
+  .house-mini:hover { transform: scale(1.04); }
+  .house-mini.g { background: rgba(116,0,1,0.3); border-color: rgba(211,166,37,0.5); }
+  .house-mini.h { background: rgba(236,185,57,0.2); border-color: rgba(236,185,57,0.5); }
+  .house-mini.r { background: rgba(14,26,64,0.5); border-color: rgba(148,107,45,0.5); }
+  .house-mini.s { background: rgba(26,71,42,0.3); border-color: rgba(170,170,170,0.5); }
+  .house-mini .hmoji { font-size: 24px; display: block; margin-bottom: 4px; }
+  .house-mini .hname {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    display: block;
+  }
+  .house-mini.g .hname { color: var(--gryffindor-accent); }
+  .house-mini.h .hname { color: var(--hufflepuff-primary); }
+  .house-mini.r .hname { color: var(--ravenclaw-accent); }
+  .house-mini.s .hname { color: var(--slytherin-accent); }
+
+  .start-btn {
+    width: 100%;
+    padding: 16px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    border-radius: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    letter-spacing: 3px;
+    color: var(--gold-light);
+    cursor: pointer;
+    transition: all 0.35s;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+  }
+  .start-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+  .start-btn:hover { color: var(--bg-deep); }
+  .start-btn:hover::before { opacity: 1; }
+  .start-btn span { position: relative; z-index: 1; }
+
+  /* ── RESULT SCREEN ── */
+  .result-wrap { text-align: center; }
+  .reveal-text {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .house-banner {
+    width: 100%;
+    border-radius: 20px;
+    padding: 32px 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid;
+    animation: bannerReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  @keyframes bannerReveal {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .house-banner.gryffindor {
+    background: linear-gradient(145deg, #3D0000, #740001, #1A0000);
+    border-color: var(--gryffindor-accent);
+    box-shadow: 0 0 60px rgba(211,166,37,0.3), inset 0 0 40px rgba(116,0,1,0.5);
+  }
+  .house-banner.hufflepuff {
+    background: linear-gradient(145deg, #5C4000, #ECB939, #3A2800);
+    border-color: var(--hufflepuff-accent);
+    box-shadow: 0 0 60px rgba(236,185,57,0.4), inset 0 0 40px rgba(55,46,41,0.5);
+  }
+  .house-banner.ravenclaw {
+    background: linear-gradient(145deg, #050B1E, #0E1A40, #020510);
+    border-color: var(--ravenclaw-accent);
+    box-shadow: 0 0 60px rgba(148,107,45,0.3), inset 0 0 40px rgba(14,26,64,0.5);
+  }
+  .house-banner.slytherin {
+    background: linear-gradient(145deg, #081B10, #1A472A, #040D08);
+    border-color: var(--slytherin-accent);
+    box-shadow: 0 0 60px rgba(170,170,170,0.2), inset 0 0 40px rgba(26,71,42,0.5);
+  }
+
+  .house-crest-big {
+    font-size: 80px;
+    display: block;
+    margin-bottom: 12px;
+    animation: crestSpin 1s cubic-bezier(0.34,1.56,0.64,1);
+    filter: drop-shadow(0 0 20px currentColor);
+  }
+  @keyframes crestSpin {
+    from { transform: rotateY(90deg) scale(0.5); opacity: 0; }
+    to { transform: rotateY(0deg) scale(1); opacity: 1; }
+  }
+  .house-result-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 700;
+    display: block;
+    text-shadow: 0 0 20px currentColor;
+    margin-bottom: 6px;
+  }
+  .house-banner.gryffindor .house-result-name { color: var(--gryffindor-accent); }
+  .house-banner.hufflepuff .house-result-name { color: var(--hufflepuff-accent); }
+  .house-banner.ravenclaw .house-result-name { color: var(--ravenclaw-accent); }
+  .house-banner.slytherin .house-result-name { color: var(--slytherin-accent); }
+
+  .house-motto {
+    font-family: 'Crimson Text', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(245,232,200,0.7);
+    letter-spacing: 1px;
+  }
+
+  /* ── RESULT IMAGE ── */
+  .house-image-container {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+    height: 200px;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+  .house-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .house-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,8,18,0.8), transparent 50%);
+  }
+
+  /* ── TRAITS ── */
+  .traits-section {
+    margin-bottom: 20px;
+  }
+  .traits-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .traits-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .trait-pill {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-size: 14px;
+    color: var(--gold-light);
+    animation: pillPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes pillPop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .house-desc {
+    font-family: 'Crimson Text', 'Sarabun', serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: rgba(245,232,200,0.85);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .retry-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+  }
+  .retry-btn:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+
+  /* ── ORNAMENT DIVIDER ── */
+  .ornament {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0;
+    opacity: 0.5;
+  }
+  .ornament-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .ornament-line:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
+  .ornament-diamond { color: var(--gold); font-size: 10px; }
+
+  /* ── SCREEN TRANSITIONS ── */
+  .screen { animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── SORTING HAT ANIMATION ── */
+  .sorting-hat-screen {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .hat-emoji {
+    font-size: 72px;
+    display: block;
+    animation: hatWiggle 0.6s ease-in-out infinite alternate;
+    margin-bottom: 16px;
+  }
+  @keyframes hatWiggle {
+    from { transform: rotate(-5deg) scale(1); }
+    to { transform: rotate(5deg) scale(1.05); }
+  }
+  .thinking-dots {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .score-bars {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .score-bar-item { display: flex; align-items: center; gap: 8px; }
+  .score-bar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    width: 80px;
+    text-align: right;
+    color: rgba(245,232,200,0.7);
+  }
+  .score-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-bar-fg {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+  .sbg { background: linear-gradient(90deg, #740001, #D3A625); }
+  .sbh { background: linear-gradient(90deg, #372E29, #ECB939); }
+  .sbr { background: linear-gradient(90deg, #0E1A40, #946B2D); }
+  .sbs { background: linear-gradient(90deg, #1A472A, #AAAAAA); }
+
+  @media (min-width: 480px) {
+    #app { padding: 24px 20px 60px; }
+    .question-text { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+<button id="lang-btn">TH / EN</button>
+<div id="app"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+
+const LANG = { current: 'en' };
+
+const TEXT = {
+  en: {
+    title: "The Sorting Hat",
+    subtitle: "Hogwarts School of Witchcraft & Wizardry",
+    introDesc: "Answer 5 questions truthfully. The Sorting Hat will reveal your true Hogwarts house.",
+    start: "✦ Begin the Sorting ✦",
+    questionLabel: q => `Question ${q} of 5`,
+    next: "Continue ⟶",
+    sortingTitle: "The Sorting Hat Deliberates...",
+    sortingLabel: "Examining your soul",
+    revealLabel: "✦ The Sorting Hat Declares ✦",
+    retakeLabel: "↺  Retake the Sorting",
+    traitsLabel: "Your traits",
+    houses: {
+      gryffindor: { name: "Gryffindor", motto: "Brave of Heart, Strong of Soul", desc: "You belong in Gryffindor — the house of courage, bravery, and nerve. You charge into challenges head-on, defend others without hesitation, and lead by example. The lion's spirit runs in your blood." },
+      hufflepuff: { name: "Hufflepuff", motto: "Loyal, Patient, True", desc: "You belong in Hufflepuff — the house of loyalty, patience, and hard work. You are dependable, kind-hearted, and fair to everyone. Your warmth and dedication make the world a better place." },
+      ravenclaw: { name: "Ravenclaw", motto: "Wit, Wisdom, Wonder", desc: "You belong in Ravenclaw — the house of wit, wisdom, and creativity. You crave knowledge, think deeply before acting, and see the world in ways others miss. The pursuit of truth is your greatest quest." },
+      slytherin: { name: "Slytherin", motto: "Ambitious, Cunning, Proud", desc: "You belong in Slytherin — the house of ambition, cunning, and resourcefulness. You know what you want and have the cleverness and drive to get it. Your determination and strategic mind set you apart." }
+    },
+    traits: {
+      gryffindor: ["Brave", "Daring", "Chivalrous", "Determined", "Bold"],
+      hufflepuff: ["Loyal", "Patient", "Kind", "Hardworking", "Fair"],
+      ravenclaw: ["Wise", "Creative", "Curious", "Analytical", "Witty"],
+      slytherin: ["Ambitious", "Cunning", "Resourceful", "Strategic", "Proud"]
+    },
+    questions: [
+      {
+        icon: "⚔️",
+        text: "Which quality do you value MOST in yourself?",
+        opts: [
+          { text: "Courage — I face my fears head-on, no matter the risk.", house: 'gryffindor' },
+          { text: "Loyalty — I stand by the people I love, no matter what.", house: 'hufflepuff' },
+          { text: "Intelligence — I think before I act and love to learn.", house: 'ravenclaw' },
+          { text: "Ambition — I know what I want and I'm driven to get it.", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "🔮",
+        text: "You discover a powerful magical artifact. What do you do?",
+        opts: [
+          { text: "Use it to protect others from danger right away.", house: 'gryffindor' },
+          { text: "Share it fairly so everyone benefits equally.", house: 'hufflepuff' },
+          { text: "Study it thoroughly to understand its true nature.", house: 'ravenclaw' },
+          { text: "Secure it — such power should be in capable hands.", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "🌙",
+        text: "It's a perfect free evening. What do you do?",
+        opts: [
+          { text: "Go on a spontaneous adventure with my closest friends.", house: 'gryffindor' },
+          { text: "Host a cozy gathering and make everyone feel welcome.", house: 'hufflepuff' },
+          { text: "Dive into a fascinating book or explore a new idea.", house: 'ravenclaw' },
+          { text: "Plan my next big move and work toward my goals.", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "🌊",
+        text: "Your deepest fear is...",
+        opts: [
+          { text: "Being seen as a coward who let others down.", house: 'gryffindor' },
+          { text: "Losing the people I care about or failing to protect them.", house: 'hufflepuff' },
+          { text: "Being ignorant — to miss something important because I didn't think enough.", house: 'ravenclaw' },
+          { text: "Failure. Being ordinary, forgotten, and leaving no legacy.", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "⚡",
+        text: "When you face a difficult conflict, you...",
+        opts: [
+          { text: "Charge in — I confront it directly and defend what's right.", house: 'gryffindor' },
+          { text: "Try to mediate — I find common ground and keep the peace.", house: 'hufflepuff' },
+          { text: "Analyze it — I find the most logical, fair resolution possible.", house: 'ravenclaw' },
+          { text: "Strategize — I turn the situation to my advantage.", house: 'slytherin' }
+        ]
+      }
+    ]
+  },
+  th: {
+    title: "หมวกคัดสรร",
+    subtitle: "โรงเรียนฮอกวอตส์แห่งเวทมนตร์และเวทยาคม",
+    introDesc: "ตอบ 5 คำถามอย่างซื่อสัตย์ หมวกคัดสรรจะเปิดเผยบ้านที่แท้จริงของคุณ",
+    start: "✦ เริ่มการคัดสรร ✦",
+    questionLabel: q => `คำถามที่ ${q} จากทั้งหมด 5`,
+    next: "ถัดไป ⟶",
+    sortingTitle: "หมวกคัดสรรกำลังพิจารณา...",
+    sortingLabel: "กำลังตรวจสอบจิตวิญญาณของคุณ",
+    revealLabel: "✦ หมวกคัดสรรประกาศ ✦",
+    retakeLabel: "↺  ทำแบบทดสอบใหม่",
+    traitsLabel: "ลักษณะนิสัยของคุณ",
+    houses: {
+      gryffindor: { name: "กริฟฟินดอร์", motto: "กล้าหาญ มีหัวใจ แข็งแกร่ง", desc: "คุณเป็นของกริฟฟินดอร์ — บ้านแห่งความกล้าหาญ ความมุ่งมั่น และจิตใจที่แน่วแน่ คุณพร้อมเผชิญความท้าทายโดยตรง ปกป้องผู้อื่นโดยไม่ลังเล และเป็นผู้นำด้วยตัวอย่าง วิญญาณของสิงโตไหลเวียนอยู่ในสายเลือดคุณ" },
+      hufflepuff: { name: "ฮัฟเฟิลพัฟฟ์", motto: "ซื่อสัตย์ อดทน และจริงใจ", desc: "คุณเป็นของฮัฟเฟิลพัฟฟ์ — บ้านแห่งความจงรักภักดี ความอดทน และความขยันหมั่นเพียร คุณน่าไว้วางใจ ใจดี และปฏิบัติต่อทุกคนอย่างเป็นธรรม ความอบอุ่นและความทุ่มเทของคุณทำให้โลกดีขึ้น" },
+      ravenclaw: { name: "เรเวนคลอว์", motto: "ปัญญา ความรู้ ความสงสัยใคร่รู้", desc: "คุณเป็นของเรเวนคลอว์ — บ้านแห่งสติปัญญา ความฉลาด และความคิดสร้างสรรค์ คุณกระหายความรู้ คิดอย่างลึกซึ้ง และมองโลกในมุมที่คนอื่นมองข้าม การแสวงหาความจริงคือพันธกิจยิ่งใหญ่ของคุณ" },
+      slytherin: { name: "สลิธีรีน", motto: "ทะเยอทะยาน แยบยล และภาคภูมิใจ", desc: "คุณเป็นของสลิธีรีน — บ้านแห่งความทะเยอทะยาน ความแยบยล และทรัพยากรที่ชาญฉลาด คุณรู้ดีว่าต้องการอะไรและมีความฉลาดและแรงขับดันเพื่อบรรลุเป้าหมาย ความมุ่งมั่นและจิตใจเชิงกลยุทธ์ทำให้คุณโดดเด่น" }
+    },
+    traits: {
+      gryffindor: ["กล้าหาญ", "ฉลาดล้ำ", "อัศวิน", "มุ่งมั่น", "กล้า"],
+      hufflepuff: ["ซื่อสัตย์", "อดทน", "ใจดี", "ขยันหมั่นเพียร", "ยุติธรรม"],
+      ravenclaw: ["ฉลาดปราดเปรื่อง", "สร้างสรรค์", "ช่างสงสัย", "วิเคราะห์", "เฉลียวฉลาด"],
+      slytherin: ["ทะเยอทะยาน", "แยบยล", "ประหยัดทรัพยากร", "มีกลยุทธ์", "ภาคภูมิใจ"]
+    },
+    questions: [
+      {
+        icon: "⚔️",
+        text: "คุณให้คุณค่ากับสิ่งใดมากที่สุดในตัวเอง?",
+        opts: [
+          { text: "ความกล้าหาญ — ฉันเผชิญกับความกลัวโดยตรง ไม่ว่าจะเสี่ยงแค่ไหน", house: 'gryffindor' },
+          { text: "ความซื่อสัตย์ — ฉันยืนหยัดเคียงข้างคนที่รัก ไม่ว่าจะเกิดอะไรขึ้น", house: 'hufflepuff' },
+          { text: "ปัญญา — ฉันคิดก่อนทำและชอบเรียนรู้สิ่งใหม่ๆ", house: 'ravenclaw' },
+          { text: "ความทะเยอทะยาน — ฉันรู้ว่าต้องการอะไรและมุ่งมั่นจะได้มัน", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "🔮",
+        text: "คุณค้นพบวัตถุเวทมนตร์อันทรงพลัง คุณจะทำอะไร?",
+        opts: [
+          { text: "ใช้มันปกป้องผู้อื่นจากอันตรายทันที", house: 'gryffindor' },
+          { text: "แบ่งปันอย่างยุติธรรมเพื่อให้ทุกคนได้ประโยชน์เท่าเทียมกัน", house: 'hufflepuff' },
+          { text: "ศึกษาอย่างละเอียดเพื่อเข้าใจธรรมชาติที่แท้จริง", house: 'ravenclaw' },
+          { text: "เก็บรักษาไว้ — พลังงานเช่นนี้ควรอยู่ในมือที่มีความสามารถ", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "🌙",
+        text: "คืนที่ว่างสมบูรณ์แบบ คุณจะทำอะไร?",
+        opts: [
+          { text: "ออกผจญภัยแบบไม่ได้วางแผนกับเพื่อนสนิท", house: 'gryffindor' },
+          { text: "จัดงานเล็กๆ อบอุ่น และทำให้ทุกคนรู้สึกถูกต้อนรับ", house: 'hufflepuff' },
+          { text: "อ่านหนังสือที่น่าสนใจหรือสำรวจแนวคิดใหม่ๆ", house: 'ravenclaw' },
+          { text: "วางแผนก้าวต่อไปและมุ่งสู่เป้าหมายของตัวเอง", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "🌊",
+        text: "ความกลัวที่ลึกที่สุดของคุณคือ...",
+        opts: [
+          { text: "ถูกมองว่าขี้ขลาดและทำให้ผู้อื่นผิดหวัง", house: 'gryffindor' },
+          { text: "สูญเสียคนที่รักหรือไม่สามารถปกป้องพวกเขาได้", house: 'hufflepuff' },
+          { text: "ความโง่เขลา — พลาดสิ่งสำคัญเพราะไม่คิดให้รอบคอบ", house: 'ravenclaw' },
+          { text: "ความล้มเหลว การเป็นคนธรรมดา ถูกลืม และไม่ทิ้งมรดกใดไว้", house: 'slytherin' }
+        ]
+      },
+      {
+        icon: "⚡",
+        text: "เมื่อเผชิญกับความขัดแย้งที่ยากลำบาก คุณ...",
+        opts: [
+          { text: "บุกเข้าหา — ฉันเผชิญโดยตรงและปกป้องสิ่งที่ถูกต้อง", house: 'gryffindor' },
+          { text: "พยายามไกล่เกลี่ย — หาจุดร่วมและรักษาสันติภาพ", house: 'hufflepuff' },
+          { text: "วิเคราะห์ — หาทางออกที่สมเหตุสมผลและยุติธรรมที่สุด", house: 'ravenclaw' },
+          { text: "วางกลยุทธ์ — เปลี่ยนสถานการณ์ให้เป็นประโยชน์ต่อตัวเอง", house: 'slytherin' }
+        ]
+      }
+    ]
+  }
+};
+
+// House images (using Unsplash/public domain)
+const HOUSE_IMAGES = {
+  gryffindor: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Hogwarts-Gryffindor.jpg/640px-Hogwarts-Gryffindor.jpg",
+  hufflepuff: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Hogwarts-Hufflepuff.jpg/640px-Hogwarts-Hufflepuff.jpg",
+  ravenclaw: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Hogwarts-Ravenclaw.jpg/640px-Hogwarts-Ravenclaw.jpg",
+  slytherin: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Hogwarts-Slytherin.jpg/640px-Hogwarts-Slytherin.jpg"
+};
+
+// CSS fallback images (styled divs)
+const HOUSE_COLORS = {
+  gryffindor: { bg: 'linear-gradient(145deg, #740001, #D3A625, #740001)', emoji: '🦁' },
+  hufflepuff: { bg: 'linear-gradient(145deg, #372E29, #ECB939, #372E29)', emoji: '🦡' },
+  ravenclaw:  { bg: 'linear-gradient(145deg, #0E1A40, #946B2D, #0E1A40)', emoji: '🦅' },
+  slytherin:  { bg: 'linear-gradient(145deg, #1A472A, #AAAAAA, #1A472A)', emoji: '🐍' }
+};
+
+// ─────────────────────────────────────────────
+// STARS
+// ─────────────────────────────────────────────
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  initStars();
+}
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 180; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.2,
+      a: Math.random(),
+      speed: Math.random() * 0.005 + 0.002,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+function drawStars(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    const a = s.a * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 240, 200, ${a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+requestAnimationFrame(drawStars);
+
+// ─────────────────────────────────────────────
+// PARTICLES
+// ─────────────────────────────────────────────
+function spawnParticles() {
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDelay = (Math.random() * 8) + 's';
+    p.style.animationDuration = (6 + Math.random() * 6) + 's';
+    p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+    document.body.appendChild(p);
+  }
+}
+spawnParticles();
+
+// ─────────────────────────────────────────────
+// APP STATE
+// ─────────────────────────────────────────────
+let state = {
+  screen: 'intro', // intro | quiz | sorting | result
+  currentQ: 0,
+  selected: null,
+  answers: [], // house names
+  scores: { gryffindor: 0, hufflepuff: 0, ravenclaw: 0, slytherin: 0 },
+  result: null
+};
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function t() { return TEXT[LANG.current]; }
+
+function getResult() {
+  return Object.entries(state.scores).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+const app = document.getElementById('app');
+
+function render() {
+  switch(state.screen) {
+    case 'intro': renderIntro(); break;
+    case 'quiz': renderQuiz(); break;
+    case 'sorting': renderSorting(); break;
+    case 'result': renderResult(); break;
+  }
+}
+
+function renderIntro() {
+  const tx = t();
+  app.innerHTML = `
+    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      ${hogwartsCrestSVG()}
+      <div class="title-block">
+        <div class="title-en">${tx.title}</div>
+        <div class="title-sub">${tx.subtitle}</div>
+      </div>
+      <div class="card">
+        <p class="intro-desc">${tx.introDesc}</p>
+        <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond">⟡</div><div class="ornament-line"></div></div>
+        <div class="intro-houses">
+          <div class="house-mini g">
+            <span class="hmoji">🦁</span>
+            <span class="hname">GRYFFINDOR</span>
+          </div>
+          <div class="house-mini h">
+            <span class="hmoji">🦡</span>
+            <span class="hname">HUFFLEPUFF</span>
+          </div>
+          <div class="house-mini r">
+            <span class="hmoji">🦅</span>
+            <span class="hname">RAVENCLAW</span>
+          </div>
+          <div class="house-mini s">
+            <span class="hmoji">🐍</span>
+            <span class="hname">SLYTHERIN</span>
+          </div>
+        </div>
+        <button class="start-btn" onclick="startQuiz()"><span>${tx.start}</span></button>
+      </div>
+    </div>
+  `;
+}
+
+function renderQuiz() {
+  const tx = t();
+  const q = tx.questions[state.currentQ];
+  const pct = (state.currentQ / 5) * 100;
+
+  const dotsHTML = [0,1,2,3,4].map(i => {
+    let cls = 'progress-dot';
+    if (i < state.currentQ) cls += ' done';
+    if (i === state.currentQ) cls += ' active';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  const optsHTML = shuffle(q.opts).map((o,i) => `
+    <button class="option-btn" onclick="selectOption('${o.house}', this)" data-house="${o.house}">
+      <div class="option-letter">${String.fromCharCode(65+i)}</div>
+      <span>${o.text}</span>
+    </button>
+  `).join('');
+
+  app.innerHTML = `
+    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      ${hogwartsCrestSVG(50)}
+      <div style="width:100%;margin-bottom:16px;">
+        <div class="progress-label">${tx.questionLabel(state.currentQ+1)}</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        <div class="progress-dots">${dotsHTML}</div>
+      </div>
+      <div class="card">
+        <div class="question-num">${tx.questionLabel(state.currentQ+1)}</div>
+        <span class="question-icon">${q.icon}</span>
+        <p class="question-text">${q.text}</p>
+        <div class="options-grid">${optsHTML}</div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">${tx.next}</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSorting() {
+  const tx = t();
+  const total = Object.values(state.scores).reduce((a,b)=>a+b,0);
+
+  const bars = ['gryffindor','hufflepuff','ravenclaw','slytherin'].map(h => {
+    const pct = total > 0 ? (state.scores[h]/total*100) : 25;
+    const labels = { gryffindor:'Gryffindor', hufflepuff:'Hufflepuff', ravenclaw:'Ravenclaw', slytherin:'Slytherin' };
+    const cls = { gryffindor:'sbg', hufflepuff:'sbh', ravenclaw:'sbr', slytherin:'sbs' };
+    return `
+      <div class="score-bar-item">
+        <div class="score-bar-label">${labels[h]}</div>
+        <div class="score-bar-bg"><div class="score-bar-fg ${cls[h]}" data-pct="${pct}"></div></div>
+      </div>
+    `;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      <div class="card">
+        <div class="sorting-hat-screen">
+          <span class="hat-emoji">🎩</span>
+          <div class="title-en" style="font-size:20px;margin-bottom:8px;">${tx.sortingTitle}</div>
+          <div class="thinking-dots">${tx.sortingLabel}...</div>
+          <div class="score-bars">${bars}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fg').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 200);
+
+  // Navigate to result
+  setTimeout(() => {
+    state.result = getResult();
+    state.screen = 'result';
+    render();
+  }, 3000);
+}
+
+function renderResult() {
+  const tx = t();
+  const house = state.result;
+  const houseData = tx.houses[house];
+  const traits = tx.traits[house];
+  const hc = HOUSE_COLORS[house];
+
+  const traitPills = traits.map((tr,i) =>
+    `<div class="trait-pill" style="animation-delay:${i*0.1}s">${tr}</div>`
+  ).join('');
+
+  app.innerHTML = `
+    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      ${hogwartsCrestSVG(50)}
+      <div class="title-block">
+        <div class="title-sub">${tx.revealLabel}</div>
+      </div>
+      <div class="card">
+        <div class="result-wrap">
+          <div class="house-banner ${house}" id="house-banner-main">
+            <canvas id="house-particle-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;border-radius:18px;"></canvas>
+            <div style="position:relative;z-index:2;">
+              <span class="house-crest-big">${hc.emoji}</span>
+              <span class="house-result-name">${houseData.name}</span>
+              <div class="house-motto">"${houseData.motto}"</div>
+            </div>
+          </div>
+
+          <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond">⟡</div><div class="ornament-line"></div></div>
+
+          <div class="traits-section">
+            <div class="traits-title">${tx.traitsLabel}</div>
+            <div class="traits-grid">${traitPills}</div>
+          </div>
+
+          <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond">⟡</div><div class="ornament-line"></div></div>
+
+          <p class="house-desc">${houseData.desc}</p>
+
+          <button class="retry-btn" onclick="retake()">${tx.retakeLabel}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Start house-specific particle animation
+  requestAnimationFrame(() => startHouseParticles(house));
+}
+
+// ─────────────────────────────────────────────
+// HOUSE PARTICLE ANIMATIONS
+// ─────────────────────────────────────────────
+let particleAnimId = null;
+
+function startHouseParticles(house) {
+  if (particleAnimId) cancelAnimationFrame(particleAnimId);
+
+  const banner = document.getElementById('house-banner-main');
+  const canvas = document.getElementById('house-particle-canvas');
+  if (!canvas || !banner) return;
+
+  // Size canvas to banner
+  function resize() {
+    canvas.width  = banner.offsetWidth;
+    canvas.height = banner.offsetHeight;
+  }
+  resize();
+
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let shootingStars = [];
+
+  // ── GRYFFINDOR — fire embers ──────────────────────────────
+  if (house === 'gryffindor') {
+    function spawnFire() {
+      const x = Math.random() * canvas.width;
+      particles.push({
+        x, y: canvas.height + 5,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: -(Math.random() * 2.5 + 1),
+        size: Math.random() * 6 + 2,
+        life: 1,
+        decay: Math.random() * 0.012 + 0.008,
+        hue: Math.random() * 30,        // 0–30 → red-orange
+        type: Math.random() < 0.3 ? 'ember' : 'flame'
+      });
+    }
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: -(Math.random() * 2.5 + 1),
+        size: Math.random() * 6 + 2,
+        life: Math.random(),
+        decay: Math.random() * 0.012 + 0.008,
+        hue: Math.random() * 30,
+        type: Math.random() < 0.3 ? 'ember' : 'flame'
+      });
+    }
+
+    function drawFire(ts) {
+      particleAnimId = requestAnimationFrame(drawFire);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (Math.random() < 0.6) spawnFire();
+
+      particles.forEach(p => {
+        p.x  += p.vx + Math.sin(ts * 0.002 + p.y * 0.05) * 0.4;
+        p.y  += p.vy;
+        p.life -= p.decay;
+        p.size *= 0.997;
+        if (p.life <= 0) {
+          p.x = Math.random() * canvas.width;
+          p.y = canvas.height + 5;
+          p.life = 1;
+          p.size = Math.random() * 6 + 2;
+        }
+        const a = Math.max(0, p.life);
+        if (p.type === 'ember') {
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.fillStyle = `hsl(${p.hue + 20},100%,70%)`;
+          ctx.shadowColor = `hsl(${p.hue},100%,60%)`;
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          // teardrop flame shape
+          ctx.save();
+          ctx.globalAlpha = a * 0.55;
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y - p.size, p.size * 1.5);
+          grad.addColorStop(0,   `hsla(${p.hue + 40},100%,80%,1)`);
+          grad.addColorStop(0.4, `hsla(${p.hue + 10},100%,55%,0.8)`);
+          grad.addColorStop(1,   `hsla(${p.hue},100%,30%,0)`);
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y, p.size * 0.6, p.size * 1.2, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+    }
+    drawFire(0);
+  }
+
+  // ── HUFFLEPUFF — soft golden bubbles & petals ─────────────
+  else if (house === 'hufflepuff') {
+    for (let i = 0; i < 50; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -(Math.random() * 0.6 + 0.2),
+        r: Math.random() * 8 + 3,
+        life: Math.random(),
+        decay: Math.random() * 0.004 + 0.002,
+        hue: Math.random() * 40 + 30, // warm yellow-amber
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: Math.random() * 0.03 + 0.01,
+        type: Math.random() < 0.4 ? 'petal' : 'bubble'
+      });
+    }
+
+    function drawHuff(ts) {
+      particleAnimId = requestAnimationFrame(drawHuff);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (Math.random() < 0.25) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + 10,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -(Math.random() * 0.6 + 0.2),
+          r: Math.random() * 8 + 3,
+          life: 1,
+          decay: Math.random() * 0.004 + 0.002,
+          hue: Math.random() * 40 + 30,
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSpeed: Math.random() * 0.03 + 0.01,
+          type: Math.random() < 0.4 ? 'petal' : 'bubble'
+        });
+      }
+
+      particles.forEach(p => {
+        p.wobble += p.wobbleSpeed;
+        p.x += p.vx + Math.sin(p.wobble) * 0.5;
+        p.y += p.vy;
+        p.life -= p.decay;
+        if (p.life <= 0) {
+          p.x = Math.random() * canvas.width;
+          p.y = canvas.height + 10;
+          p.life = 1;
+        }
+        const a = Math.max(0, p.life);
+
+        if (p.type === 'bubble') {
+          ctx.save();
+          ctx.globalAlpha = a * 0.6;
+          const g = ctx.createRadialGradient(p.x - p.r*0.3, p.y - p.r*0.3, 0, p.x, p.y, p.r);
+          g.addColorStop(0, `hsla(${p.hue + 20},100%,95%,0.8)`);
+          g.addColorStop(0.5, `hsla(${p.hue},90%,70%,0.4)`);
+          g.addColorStop(1, `hsla(${p.hue},80%,50%,0)`);
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = `hsla(${p.hue + 10},100%,80%,${a * 0.5})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+          ctx.restore();
+        } else {
+          // soft petal
+          ctx.save();
+          ctx.globalAlpha = a * 0.7;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.wobble);
+          ctx.fillStyle = `hsla(${p.hue},90%,75%,0.8)`;
+          ctx.shadowColor = `hsla(${p.hue},100%,80%,0.5)`;
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          ctx.ellipse(0, -p.r * 0.5, p.r * 0.5, p.r, 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+    }
+    drawHuff(0);
+  }
+
+  // ── RAVENCLAW — stars & shooting stars ───────────────────
+  else if (house === 'ravenclaw') {
+    // Static sparkle stars
+    for (let i = 0; i < 55; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2.5 + 0.5,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.04 + 0.01,
+        hue: Math.random() * 60 + 190, // blue-silver
+        life: 1,
+        twinkle: Math.random() < 0.4
+      });
+    }
+
+    function spawnShooter() {
+      shootingStars.push({
+        x: Math.random() * canvas.width * 1.5 - canvas.width * 0.25,
+        y: Math.random() * canvas.height * 0.4,
+        vx: Math.random() * 6 + 3,
+        vy: Math.random() * 3 + 1.5,
+        len: Math.random() * 80 + 40,
+        life: 1,
+        decay: Math.random() * 0.025 + 0.015,
+        hue: Math.random() * 60 + 190
+      });
+    }
+
+    function drawRaven(ts) {
+      particleAnimId = requestAnimationFrame(drawRaven);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Shooting stars (occasional)
+      if (Math.random() < 0.012) spawnShooter();
+      shootingStars = shootingStars.filter(s => s.life > 0);
+      shootingStars.forEach(s => {
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life -= s.decay;
+        const a = Math.max(0, s.life);
+        const grad = ctx.createLinearGradient(s.x, s.y, s.x - s.vx * s.len / 6, s.y - s.vy * s.len / 6);
+        grad.addColorStop(0, `hsla(${s.hue},100%,90%,${a})`);
+        grad.addColorStop(1, `hsla(${s.hue},100%,70%,0)`);
+        ctx.save();
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = a;
+        ctx.shadowColor = `hsl(${s.hue},100%,80%)`;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x - s.vx * (s.len / 6), s.y - s.vy * (s.len / 6));
+        ctx.stroke();
+        // bright head dot
+        ctx.fillStyle = `hsla(${s.hue},100%,95%,${a})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Sparkle stars
+      particles.forEach(p => {
+        const blink = 0.5 + 0.5 * Math.sin(ts * p.speed + p.phase);
+        const a = p.twinkle ? blink * 0.9 : 0.6;
+        const r = p.twinkle ? p.r * (0.7 + 0.5 * blink) : p.r;
+
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.shadowColor = `hsl(${p.hue},100%,80%)`;
+        ctx.shadowBlur = p.twinkle ? 12 * blink : 4;
+
+        // 4-pointed star sparkle
+        ctx.fillStyle = `hsl(${p.hue},80%,85%)`;
+        ctx.translate(p.x, p.y);
+        ctx.beginPath();
+        for (let k = 0; k < 4; k++) {
+          const ang = (k / 4) * Math.PI * 2;
+          const innerAng = ang + Math.PI / 4;
+          const outerR = r * 2.5;
+          const innerR = r * 0.8;
+          if (k === 0) ctx.moveTo(Math.cos(ang) * outerR, Math.sin(ang) * outerR);
+          else ctx.lineTo(Math.cos(ang) * outerR, Math.sin(ang) * outerR);
+          ctx.lineTo(Math.cos(innerAng) * innerR, Math.sin(innerAng) * innerR);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+    drawRaven(0);
+  }
+
+  // ── SLYTHERIN — flowing green mist & serpent wisps ────────
+  else if (house === 'slytherin') {
+    const NUM = 45;
+    for (let i = 0; i < NUM; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 18 + 6,
+        life: Math.random(),
+        decay: Math.random() * 0.005 + 0.002,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.02 + 0.005,
+        hue: Math.random() * 30 + 100, // green range
+        sat: Math.random() * 40 + 50,
+        bright: Math.random() * 20 + 30,
+        snake: Math.random() < 0.3
+      });
+    }
+
+    // Serpent wisp nodes (chain of dots)
+    const wisps = Array.from({length: 3}, (_, wi) => ({
+      nodes: Array.from({length: 12}, (_, ni) => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height
+      })),
+      angle: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.008 + 0.004,
+      hue: 120 + Math.random() * 20,
+      life: Math.random()
+    }));
+
+    function drawSlytherin(ts) {
+      particleAnimId = requestAnimationFrame(drawSlytherin);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Mist blobs
+      particles.forEach(p => {
+        p.phase += p.speed;
+        p.x += p.vx + Math.cos(p.phase) * 0.4;
+        p.y += p.vy + Math.sin(p.phase * 0.7) * 0.3;
+        p.life -= p.decay;
+
+        if (p.x < -p.r) p.x = canvas.width + p.r;
+        if (p.x > canvas.width + p.r) p.x = -p.r;
+        if (p.life <= 0) { p.life = 1; p.y = Math.random() * canvas.height; }
+
+        const a = Math.max(0, Math.min(1, p.life)) * 0.35;
+        ctx.save();
+        ctx.globalAlpha = a;
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+        g.addColorStop(0, `hsla(${p.hue},${p.sat + 20}%,${p.bright + 30}%,0.8)`);
+        g.addColorStop(0.5, `hsla(${p.hue},${p.sat}%,${p.bright}%,0.4)`);
+        g.addColorStop(1, `hsla(${p.hue},${p.sat - 10}%,${p.bright}%,0)`);
+        ctx.fillStyle = g;
+        ctx.shadowColor = `hsl(${p.hue},80%,40%)`;
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Serpent wisps — sinuous glowing trails
+      wisps.forEach((w, wi) => {
+        w.angle += w.speed + Math.sin(ts * 0.001 + wi) * 0.005;
+        const head = w.nodes[0];
+        head.x += Math.cos(w.angle + Math.sin(ts * 0.0015 + wi * 2) * 0.8) * 1.5;
+        head.y += Math.sin(w.angle + Math.cos(ts * 0.001 + wi * 1.5) * 0.6) * 1.2;
+
+        // Wrap around
+        if (head.x < 0) head.x = canvas.width;
+        if (head.x > canvas.width) head.x = 0;
+        if (head.y < 0) head.y = canvas.height;
+        if (head.y > canvas.height) head.y = 0;
+
+        // Chain follow
+        for (let ni = w.nodes.length - 1; ni > 0; ni--) {
+          const curr = w.nodes[ni], prev = w.nodes[ni - 1];
+          curr.x += (prev.x - curr.x) * 0.18;
+          curr.y += (prev.y - curr.y) * 0.18;
+        }
+
+        // Draw wisp as a glowing path
+        ctx.save();
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = `hsl(${w.hue},100%,55%)`;
+        ctx.shadowBlur = 14;
+        w.nodes.forEach((node, ni) => {
+          const frac = 1 - ni / w.nodes.length;
+          ctx.globalAlpha = frac * 0.65;
+          ctx.strokeStyle = `hsla(${w.hue + ni * 3},100%,${55 + ni * 2}%,${frac})`;
+          ctx.beginPath();
+          if (ni > 0) {
+            ctx.moveTo(w.nodes[ni - 1].x, w.nodes[ni - 1].y);
+            ctx.lineTo(node.x, node.y);
+            ctx.stroke();
+          }
+          // Glow dot on head
+          if (ni === 0) {
+            ctx.globalAlpha = 0.9;
+            ctx.fillStyle = `hsl(${w.hue},100%,80%)`;
+            ctx.shadowBlur = 18;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+        ctx.restore();
+      });
+    }
+    drawSlytherin(0);
+  }
+}
+
+// ─────────────────────────────────────────────
+// SVG CREST
+// ─────────────────────────────────────────────
+function hogwartsCrestSVG(size=90) {
+  return `
+  <svg class="crest-svg" style="width:${size}px;height:${size}px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="cg" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#F0D080"/>
+        <stop offset="100%" stop-color="#8B6914"/>
+      </radialGradient>
+    </defs>
+    <!-- Shield -->
+    <path d="M50 8 L88 22 L88 55 Q88 80 50 95 Q12 80 12 55 L12 22 Z" fill="rgba(10,8,18,0.8)" stroke="url(#cg)" stroke-width="2"/>
+    <!-- Quadrants -->
+    <path d="M50 8 L88 22 L88 55 Q88 67 50 51.5 Z" fill="rgba(116,0,1,0.6)"/>
+    <path d="M12 22 L50 8 L50 51.5 Q12 67 12 55 Z" fill="rgba(14,26,64,0.6)"/>
+    <path d="M50 51.5 Q88 67 88 55 L88 55 Q88 80 50 95 Z" fill="rgba(236,185,57,0.4)"/>
+    <path d="M12 55 Q12 80 50 95 L50 51.5 Q12 67 12 55 Z" fill="rgba(26,71,42,0.6)"/>
+    <!-- Center dividers -->
+    <line x1="50" y1="8" x2="50" y2="95" stroke="url(#cg)" stroke-width="1" opacity="0.6"/>
+    <line x1="12" y1="51.5" x2="88" y2="51.5" stroke="url(#cg)" stroke-width="1" opacity="0.6"/>
+    <!-- Corner emblems -->
+    <text x="72" y="36" font-size="14" text-anchor="middle" dominant-baseline="middle">🦁</text>
+    <text x="28" y="36" font-size="14" text-anchor="middle" dominant-baseline="middle">🦅</text>
+    <text x="72" y="66" font-size="14" text-anchor="middle" dominant-baseline="middle">🦡</text>
+    <text x="28" y="66" font-size="14" text-anchor="middle" dominant-baseline="middle">🐍</text>
+    <!-- H letter -->
+    <text x="50" y="52" font-size="18" font-family="serif" font-weight="bold" fill="url(#cg)" text-anchor="middle" dominant-baseline="middle">H</text>
+    <!-- Stars at top -->
+    <text x="50" y="14" font-size="8" fill="#C9A84C" text-anchor="middle">✦</text>
+  </svg>`;
+}
+
+// ─────────────────────────────────────────────
+// ACTIONS
+// ─────────────────────────────────────────────
+function startQuiz() {
+  state = { screen: 'quiz', currentQ: 0, selected: null, answers: [], scores: { gryffindor:0, hufflepuff:0, ravenclaw:0, slytherin:0 }, result: null };
+  render();
+}
+
+function selectOption(house, el) {
+  // Deselect all
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selected = house;
+
+  // Show next button
+  const btn = document.getElementById('next-btn');
+  if (btn) btn.classList.add('visible');
+}
+
+function nextQuestion() {
+  if (!state.selected) return;
+
+  state.scores[state.selected]++;
+  state.answers.push(state.selected);
+  state.selected = null;
+
+  if (state.currentQ < 4) {
+    state.currentQ++;
+
+    // Slide transition
+    const card = document.querySelector('.card');
+    if (card) {
+      card.classList.add('slide-out-left');
+      setTimeout(() => render(), 350);
+    } else {
+      render();
+    }
+  } else {
+    state.screen = 'sorting';
+    render();
+  }
+}
+
+function retake() {
+  if (particleAnimId) { cancelAnimationFrame(particleAnimId); particleAnimId = null; }
+  state = { screen: 'intro', currentQ: 0, selected: null, answers: [], scores: { gryffindor:0, hufflepuff:0, ravenclaw:0, slytherin:0 }, result: null };
+  render();
+}
+
+// ─────────────────────────────────────────────
+// LANG TOGGLE
+// ─────────────────────────────────────────────
+document.getElementById('lang-btn').addEventListener('click', () => {
+  LANG.current = LANG.current === 'en' ? 'th' : 'en';
+  document.getElementById('lang-btn').textContent = LANG.current === 'en' ? 'TH / EN' : 'EN / TH';
+  // Update body font for Thai
+  document.body.style.fontFamily = LANG.current === 'th'
+    ? "'Sarabun', 'Crimson Text', serif"
+    : "'Crimson Text', 'Sarabun', serif";
+  render();
+});
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
