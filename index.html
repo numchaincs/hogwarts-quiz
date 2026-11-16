@@ -1,1036 +1,1102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hogwarts Sorting Quiz</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#07060c">
+<meta name="description" content="The Sorting Ceremony — tap your Richer NFC keychain to discover your house, wand, patronus and today's prophecy.">
+<title>The Sorting Ceremony · Richer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="sound/hogwartBGSound.mp3" as="audio">
 <script defer src="/_vercel/insights/script.js"></script>
 <style>
-  :root {
-    --gold: #C9A84C;
-    --gold-light: #F0D080;
-    --gold-dark: #8B6914;
-    --parchment: #F5E8C8;
-    --ink: #1A0F00;
-    --bg-deep: #0A0812;
-    --bg-mid: #100E1A;
-    --gryffindor-primary: #740001;
-    --gryffindor-accent: #D3A625;
-    --hufflepuff-primary: #ECB939;
-    --hufflepuff-accent: #372E29;
-    --ravenclaw-primary: #0E1A40;
-    --ravenclaw-accent: #946B2D;
-    --slytherin-primary: #1A472A;
-    --slytherin-accent: #AAAAAA;
+  :root{
+    --gold:#D4AF37; --gold-l:#F3DC8A; --gold-d:#8A6D1E;
+    --accent:#D4AF37; --accent-l:#F3DC8A; --accent2:#F3DC8A; --accent-rgb:212,175,55;
+    --ink:#07060c; --ink2:#0f0d18; --ink3:#171424;
+    --parch:#F2E6CC; --muted:rgba(242,230,204,.62);
+    --line:rgba(var(--accent-rgb),.28);
+    --en:'Cinzel',serif; --serif:'Cormorant Garamond','Prompt',serif; --th:'Prompt',sans-serif;
+    --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   }
+  body[data-house="valor"]  {--accent:#C0262D;--accent-l:#E8C15A;--accent2:#E8C15A;--accent-rgb:192,38,45}
+  body[data-house="ambit"]  {--accent:#1F8A4C;--accent-l:#C9D1D6;--accent2:#C9D1D6;--accent-rgb:31,138,76}
+  body[data-house="wisdom"] {--accent:#2F5BD3;--accent-l:#C8935A;--accent2:#C8935A;--accent-rgb:47,91,211}
+  body[data-house="loyal"]  {--accent:#E0A526;--accent-l:#F4D27A;--accent2:#2a2218;--accent-rgb:224,165,38}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--ink)}
+  body{
+    font-family:var(--serif); color:var(--parch); min-height:100vh; min-height:100dvh; overflow-x:hidden;
+    background:radial-gradient(120% 80% at 50% -10%, #1d1830 0%, var(--ink2) 45%, var(--ink) 100%) fixed;
+    transition:background .8s;
+  }
+  body.lang-th{font-family:var(--th)}
+  #dust{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .vignette{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.7) 100%)}
 
-  body {
-    font-family: 'Crimson Text', 'Kanit', serif;
-    background: var(--bg-deep);
-    color: var(--parchment);
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
+  /* floating controls */
+  .fab{position:fixed;top:calc(14px + var(--safe-t));z-index:50;height:42px;min-width:42px;padding:0 12px;border-radius:21px;
+    display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+    background:rgba(10,9,16,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--line);color:var(--accent-l);font:600 12px/1 var(--en);letter-spacing:1.5px;transition:.3s}
+  .fab:active{transform:scale(.92)}
+  #lang-btn{left:14px}
+  #sound-btn{right:14px;width:42px;padding:0}
+  #sound-btn .wave{display:flex;gap:2px;align-items:flex-end;height:16px}
+  #sound-btn .wave i{width:3px;background:var(--accent-l);border-radius:2px;height:4px}
+  #sound-btn.on{box-shadow:0 0 18px rgba(var(--accent-rgb),.55);border-color:rgba(var(--accent-rgb),.7)}
+  #sound-btn.on .wave i{animation:eq 1s ease-in-out infinite}
+  #sound-btn.on .wave i:nth-child(2){animation-delay:.2s}#sound-btn.on .wave i:nth-child(3){animation-delay:.4s}#sound-btn.on .wave i:nth-child(4){animation-delay:.1s}
+  #sound-btn .mute{display:none}
+  #sound-btn:not(.on) .wave{display:none}#sound-btn:not(.on) .mute{display:block}
+  @keyframes eq{0%,100%{height:4px}50%{height:16px}}
 
-  #stars-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
+  #app{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:calc(72px + var(--safe-t)) 18px calc(28px + var(--safe-b));min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+  .screen{display:flex;flex-direction:column;align-items:center;width:100%;animation:enter .6s cubic-bezier(.2,.8,.2,1) both;flex:1}
+  .screen.leave{animation:leave .35s ease forwards}
+  @keyframes enter{from{opacity:0;transform:translateY(18px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+  @keyframes leave{to{opacity:0;transform:translateY(-12px);filter:blur(4px)}}
 
-  .particle {
-    position: fixed;
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--gold-light);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    animation: floatUp 8s infinite;
-  }
+  .eyebrow{font:600 11px/1.4 var(--en);letter-spacing:4px;color:var(--accent-l);opacity:.75;text-transform:uppercase;text-align:center}
+  .lang-th .eyebrow{font-family:var(--th);letter-spacing:2px}
+  h1.title{font:700 clamp(30px,9vw,42px)/1.1 var(--en);text-align:center;margin:10px 0 6px;
+    background:linear-gradient(180deg,#fff6d6,var(--gold) 55%,var(--gold-d));-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 2px 14px rgba(212,175,55,.35))}
+  .lang-th h1.title{font-family:var(--th);font-weight:600}
+  .sub{font-style:italic;font-size:18px;color:var(--muted);text-align:center;max-width:340px}
+  .lang-th .sub{font-style:normal;font-size:15px;font-weight:300}
 
-  @keyframes floatUp {
-    0% { transform: translateY(100vh) scale(0); opacity: 0; }
-    10% { opacity: 0.6; }
-    90% { opacity: 0.2; }
-    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-  }
+  .card{position:relative;width:100%;margin-top:22px;padding:26px 20px;border-radius:20px;
+    background:linear-gradient(160deg,rgba(28,24,40,.82),rgba(12,10,18,.9));
+    border:1px solid var(--line);box-shadow:0 20px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.04)}
+  .card::before{content:"";position:absolute;inset:6px;border-radius:15px;border:1px solid rgba(var(--accent-rgb),.12);pointer-events:none}
+  .orn{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--accent-l);opacity:.7}
+  .orn::before,.orn::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--accent-l),transparent)}
 
-  #lang-btn {
-    position: fixed;
-    top: 16px; right: 16px;
-    z-index: 100;
-    background: rgba(201,168,76,0.15);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 1px;
-    padding: 8px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    transition: all 0.3s;
-  }
-  #lang-btn:hover { background: var(--gold); color: var(--bg-deep); }
+  .crest{width:96px;height:96px;filter:drop-shadow(0 0 22px rgba(212,175,55,.35));animation:float 5s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-6px)}}
 
-  #app {
-    position: relative;
-    z-index: 10;
-    max-width: 480px;
-    margin: 0 auto;
-    min-height: 100vh;
-    padding: 20px 16px 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  /* intro */
+  .house-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 4px}
+  .hmini{text-align:center;padding:10px 2px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+  .hmini b{display:block;font-size:24px;margin-bottom:4px}
+  .hmini span{font:600 8.5px/1.2 var(--en);letter-spacing:1px;color:var(--muted)}
+  label.fl{display:block;font:600 11px var(--en);letter-spacing:3px;color:var(--accent-l);margin:6px 0 10px;text-align:center}
+  .lang-th label.fl{font-family:var(--th);letter-spacing:1px;font-size:13px}
+  .name-in{width:100%;height:56px;border-radius:14px;padding:0 18px;text-align:center;
+    background:rgba(0,0,0,.35);border:1px solid var(--line);color:#fff;font:500 20px var(--serif);outline:none;transition:.3s}
+  .lang-th .name-in{font-family:var(--th);font-size:17px}
+  .name-in::placeholder{color:rgba(242,230,204,.3);font-style:italic}
+  .name-in:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,.15),0 0 24px rgba(212,175,55,.25)}
+  .name-in.shake{animation:shake .4s}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-  .crest-svg {
-    width: 90px; height: 90px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 0 20px rgba(201,168,76,0.5));
-    animation: floatBob 4s ease-in-out infinite;
-  }
-  @keyframes floatBob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
+  .btn{position:relative;overflow:hidden;width:100%;min-height:56px;margin-top:16px;border-radius:14px;cursor:pointer;
+    font:700 14px/1 var(--en);letter-spacing:2.5px;text-transform:uppercase;color:#1a1204;border:0;
+    background:linear-gradient(135deg,#f6e29a,var(--gold) 45%,#a8841f);box-shadow:0 8px 26px rgba(212,175,55,.35);transition:transform .15s,box-shadow .3s}
+  .lang-th .btn{font-family:var(--th);letter-spacing:1px;font-size:15px;font-weight:600}
+  .btn::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:sheen 3.2s infinite}
+  @keyframes sheen{0%,60%{left:-60%}100%{left:130%}}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:transparent;color:var(--accent-l);border:1px solid var(--line);box-shadow:none}
+  .btn.ghost::after{display:none}
+  .btn.house{background:linear-gradient(135deg,var(--accent-l),var(--accent));color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);box-shadow:0 8px 26px rgba(var(--accent-rgb),.4)}
+  .btn[disabled]{opacity:.35;pointer-events:none}
+  .btn .spin{display:none;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:rot .7s linear infinite;margin-right:8px;vertical-align:-3px}
+  .btn.loading .spin{display:inline-block}
+  .credit{margin-top:18px;text-align:center;font:500 10px var(--en);letter-spacing:2px;color:rgba(212,175,55,.35)}
 
-  .title-block { text-align: center; margin-bottom: 24px; }
-  .title-en {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(18px, 5vw, 26px);
-    color: var(--gold-light);
-    text-shadow: 0 0 30px rgba(201,168,76,0.6);
-    line-height: 1.2;
-  }
-  .title-sub {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--gold-dark);
-    margin-top: 4px;
-    text-transform: uppercase;
-  }
+  /* candles progress */
+  .candles{display:flex;justify-content:center;gap:18px;margin:4px 0 2px;height:58px;align-items:flex-end}
+  .candle{position:relative;width:10px;height:30px;border-radius:3px 3px 2px 2px;background:linear-gradient(90deg,#cfc3a6,#f4ecd8,#bfb294)}
+  .candle::before{content:"";position:absolute;top:-4px;left:4px;width:2px;height:5px;background:#333;border-radius:1px}
+  .flame{position:absolute;left:50%;bottom:100%;width:10px;height:18px;margin-left:-5px;margin-bottom:2px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    background:radial-gradient(circle at 50% 70%,#fff 0 18%,#ffd36b 35%,#ff8a1f 70%,transparent 72%);opacity:0;transform:scale(.3);transform-origin:bottom center;transition:.5s}
+  .candle.lit .flame{opacity:1;transform:scale(1);animation:flick 1.4s ease-in-out infinite alternate;filter:drop-shadow(0 0 8px #ffb347)}
+  .candle.cur .flame{opacity:1;transform:scale(1.2);animation:flick .9s ease-in-out infinite alternate;filter:drop-shadow(0 0 14px #ffd36b)}
+  .candle.cur{box-shadow:0 0 22px rgba(255,190,90,.4)}
+  @keyframes flick{0%{transform:scale(1) rotate(-3deg)}100%{transform:scale(1.08,.94) rotate(3deg)}}
+  .qcount{margin-top:8px}
 
-  .card {
-    width: 100%;
-    background: linear-gradient(145deg, rgba(20,16,36,0.95), rgba(10,8,18,0.98));
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 20px;
-    padding: 28px 24px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,168,76,0.2);
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: radial-gradient(ellipse at center, rgba(201,168,76,0.04) 0%, transparent 60%);
-    pointer-events: none;
-  }
+  .qicon{font-size:40px;text-align:center;display:block;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(212,175,55,.4))}
+  .qtext{font:600 24px/1.3 var(--serif);text-align:center;color:#fff;margin-bottom:20px}
+  .lang-th .qtext{font:500 19px/1.5 var(--th)}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;gap:14px;align-items:center;text-align:left;width:100%;min-height:62px;padding:14px 16px;border-radius:14px;cursor:pointer;
+    background:rgba(255,255,255,.025);border:1px solid rgba(212,175,55,.18);color:var(--parch);font:500 17px/1.35 var(--serif);
+    transition:transform .15s,border-color .25s,background .25s,box-shadow .25s;animation:enter .5s both}
+  .lang-th .opt{font:400 15px/1.5 var(--th)}
+  .opt .ltr{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--en);color:var(--gold);border:1px solid rgba(212,175,55,.45);transition:.25s}
+  @media (hover:hover){.opt:hover{border-color:rgba(212,175,55,.5);background:rgba(212,175,55,.06)}}
+  .opt:active{transform:scale(.98)}
+  .opt.sel{border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.18),rgba(212,175,55,.04));box-shadow:0 0 24px rgba(212,175,55,.22),inset 0 0 0 1px rgba(212,175,55,.3)}
+  .opt.sel .ltr{background:var(--gold);color:#1a1204;box-shadow:0 0 14px var(--gold)}
 
-  .progress-label {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--gold-dark);
-    text-align: center;
-    margin-bottom: 8px;
-  }
-  .progress-bar-bg {
-    height: 6px;
-    background: rgba(201,168,76,0.1);
-    border-radius: 3px;
-    overflow: hidden;
-    border: 1px solid rgba(201,168,76,0.2);
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
-    border-radius: 3px;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 10px rgba(201,168,76,0.5);
-  }
-  .progress-dots { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
-  .progress-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    border: 1px solid rgba(201,168,76,0.4);
-    background: transparent;
-    transition: all 0.4s;
-  }
-  .progress-dot.active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 8px var(--gold); }
-  .progress-dot.done { background: var(--gold-dark); border-color: var(--gold-dark); }
+  /* sorting */
+  .ritual{position:relative;width:240px;height:240px;margin:40px auto 30px}
+  .ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(212,175,55,.5)}
+  .ring.r1{border-style:dashed;animation:rot 6s linear infinite}
+  .ring.r2{inset:22px;border-color:rgba(212,175,55,.35);animation:rot 4s linear infinite reverse}
+  .ring.r3{inset:46px;border:2px solid transparent;border-top-color:var(--gold);border-bottom-color:var(--gold-l);animation:rot 1.2s linear infinite}
+  .rune{position:absolute;left:50%;top:50%;font:700 16px var(--en);color:var(--gold-l);text-shadow:0 0 10px var(--gold)}
+  .orb{position:absolute;inset:78px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff8dc,var(--gold) 40%,rgba(212,175,55,0) 72%);animation:pulse 1.2s ease-in-out infinite;display:grid;place-items:center;font-size:42px}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  @keyframes pulse{50%{transform:scale(1.12);filter:brightness(1.3)}}
+  .ritual-word{font:600 22px var(--en);text-align:center;letter-spacing:3px;min-height:30px;color:var(--gold-l);text-shadow:0 0 18px rgba(212,175,55,.6)}
+  .lang-th .ritual-word{font-family:var(--th)}
+  .flash{position:fixed;inset:0;z-index:60;background:radial-gradient(circle,#fff 0%,rgba(var(--accent-rgb),.8) 40%,transparent 75%);opacity:0;pointer-events:none}
+  .flash.go{animation:flash 1s ease-out}
+  @keyframes flash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
 
-  .question-num {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--gold-dark);
-    text-align: center;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-  }
-  .question-icon {
-    font-size: 36px;
-    text-align: center;
-    margin-bottom: 12px;
-    display: block;
-    animation: iconPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes iconPop {
-    from { transform: scale(0) rotate(-10deg); opacity: 0; }
-    to { transform: scale(1) rotate(0deg); opacity: 1; }
-  }
-  .question-text {
-    font-family: 'Crimson Text', 'Kanit', serif;
-    font-size: 20px;
-    line-height: 1.5;
-    text-align: center;
-    color: var(--parchment);
-    margin-bottom: 24px;
-    min-height: 60px;
-  }
+  /* result */
+  .banner{position:relative;width:100%;border-radius:22px;overflow:hidden;padding:34px 18px 28px;text-align:center;
+    background:linear-gradient(165deg,rgba(var(--accent-rgb),.55),rgba(10,9,16,.92) 70%);border:1px solid rgba(var(--accent-rgb),.6);
+    box-shadow:0 0 60px rgba(var(--accent-rgb),.35),0 20px 50px rgba(0,0,0,.5)}
+  .banner canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .banner > *:not(canvas){position:relative}
+  .hcrest{width:120px;height:138px;margin:4px auto 10px;display:block;filter:drop-shadow(0 0 24px rgba(var(--accent-rgb),.8));animation:pop .9s cubic-bezier(.2,1.6,.4,1) both}
+  @keyframes pop{from{transform:scale(.3);opacity:0}}
+  .hname{font:900 clamp(32px,10vw,44px)/1 var(--en);letter-spacing:4px;color:#fff;text-shadow:0 0 24px rgba(var(--accent-rgb),.9),0 2px 0 rgba(0,0,0,.4)}
+  .lang-th .hname{font-family:var(--th);font-weight:600;letter-spacing:1px}
+  .hmotto{margin-top:10px;font-style:italic;font-size:18px;color:var(--accent2)}
+  body[data-house="loyal"] .hmotto{color:var(--accent-l)}
+  .lang-th .hmotto{font-style:normal;font-size:15px}
+  .traits{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:16px}
+  .trait{padding:6px 13px;border-radius:20px;font:600 11px var(--en);letter-spacing:1.5px;border:1px solid rgba(var(--accent-rgb),.6);background:rgba(var(--accent-rgb),.18);color:#fff;animation:enter .5s both}
+  .lang-th .trait{font-family:var(--th);font-weight:400;letter-spacing:0;font-size:12px}
 
-  .options-grid { display: flex; flex-direction: column; gap: 10px; }
-  .option-btn {
-    width: 100%;
-    background: rgba(201,168,76,0.05);
-    border: 1px solid rgba(201,168,76,0.25);
-    border-radius: 12px;
-    padding: 14px 16px;
-    cursor: pointer;
-    color: var(--parchment);
-    font-family: 'Crimson Text', 'Kanit', serif;
-    font-size: 16px;
-    line-height: 1.4;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.25s;
-    position: relative;
-    overflow: hidden;
-  }
-  .option-btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(201,168,76,0.08), transparent);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .option-btn:hover { border-color: var(--gold); transform: translateX(4px); }
-  .option-btn:hover::after { opacity: 1; }
-  .option-btn:active { transform: scale(0.98); }
-  .option-btn.selected { border-color: var(--gold); background: rgba(201,168,76,0.12); transform: translateX(0); }
-  .option-letter {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    border: 1px solid rgba(201,168,76,0.4);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    color: var(--gold);
-    flex-shrink: 0;
-    transition: all 0.25s;
-  }
-  .option-btn:hover .option-letter,
-  .option-btn.selected .option-letter { background: var(--gold); color: var(--bg-deep); border-color: var(--gold); }
+  .sec-title{font:600 11px var(--en);letter-spacing:4px;color:var(--accent-l);text-align:center;margin-bottom:14px;text-transform:uppercase}
+  .lang-th .sec-title{font-family:var(--th);letter-spacing:1px;font-size:13px}
 
-  .next-btn {
-    width: 100%;
-    margin-top: 16px;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-dark));
-    background-size: 200% 100%;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    letter-spacing: 2px;
-    color: var(--bg-deep);
-    cursor: pointer;
-    transition: all 0.35s;
-    text-transform: uppercase;
-    opacity: 0;
-    pointer-events: none;
-    position: relative;
-    overflow: hidden;
-  }
-  .next-btn.visible { opacity: 1; pointer-events: all; animation: btnReveal 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-  @keyframes btnReveal {
-    from { transform: translateY(10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  .next-btn:hover { background-position: 100% 0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.4); }
-  .next-btn:active { transform: scale(0.98); }
+  .scroll{position:relative;margin-top:22px;width:100%;padding:34px 24px 30px;border-radius:6px;color:#2b1d0c;text-align:center;
+    background:radial-gradient(ellipse at 30% 20%,#fbf2da,#ecdcb4 60%,#d9c28c);box-shadow:0 18px 40px rgba(0,0,0,.55),inset 0 0 40px rgba(120,80,20,.35)}
+  .scroll::before,.scroll::after{content:"";position:absolute;left:-6px;right:-6px;height:14px;border-radius:8px;background:linear-gradient(180deg,#a88246,#5e4319);box-shadow:0 3px 6px rgba(0,0,0,.4)}
+  .scroll::before{top:-6px}.scroll::after{bottom:-6px}
+  .scroll .s-eye{font:700 10px var(--en);letter-spacing:3px;color:#7a5a22}
+  .scroll .s-name{font:700 30px/1.15 var(--en);margin:10px 0 4px;color:#3a2408;word-break:break-word}
+  .lang-th .scroll .s-name{font-family:var(--th);font-weight:600;font-size:26px}
+  .scroll p{font:italic 17px/1.55 var(--serif);color:#4a3518}
+  .lang-th .scroll p{font:400 14px/1.75 var(--th);font-style:normal}
+  .scroll .sig{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px}
+  .scroll .sig small{font:italic 14px var(--serif);color:#6b5228;text-align:left}
+  .seal{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:26px;color:#fff;
+    background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),var(--accent) 45%,rgba(0,0,0,.5));box-shadow:0 3px 8px rgba(0,0,0,.4),inset 0 0 0 3px rgba(0,0,0,.15);transform:rotate(-12deg)}
 
-  .slide-out-left { animation: slideOutLeft 0.4s forwards; }
-  @keyframes slideOutLeft { to { transform: translateX(-50px); opacity: 0; } }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;width:100%}
+  .relic{padding:18px 14px;border-radius:16px;background:linear-gradient(160deg,rgba(var(--accent-rgb),.14),rgba(12,10,18,.9));border:1px solid rgba(var(--accent-rgb),.35);text-align:center}
+  .relic .ico{font-size:30px;display:block;margin-bottom:6px}
+  .relic h4{font:600 10px var(--en);letter-spacing:3px;color:var(--accent-l);margin-bottom:8px}
+  .lang-th .relic h4{font-family:var(--th);letter-spacing:1px;font-size:12px}
+  .relic .big{font:700 19px/1.2 var(--serif);color:#fff}
+  .lang-th .relic .big{font:500 16px/1.35 var(--th)}
+  .relic dl{margin-top:8px;font-size:14px;color:var(--muted);line-height:1.45}
+  .lang-th .relic dl{font-size:12px}
+  .relic dt{display:inline;color:var(--accent-l);opacity:.8}.relic dd{display:inline}
+  .relic dd::after{content:"";display:block}
 
-  .intro-desc {
-    font-family: 'Crimson Text', 'Kanit', serif;
-    font-size: 18px;
-    line-height: 1.7;
-    text-align: center;
-    color: rgba(245,232,200,0.8);
-    margin-bottom: 24px;
-  }
-  .intro-houses { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
-  .house-mini { border-radius: 12px; padding: 14px 10px; text-align: center; border: 1px solid; transition: transform 0.3s; }
-  .house-mini:hover { transform: scale(1.04); }
-  .house-mini.g { background: rgba(116,0,1,0.3); border-color: rgba(211,166,37,0.5); }
-  .house-mini.h { background: rgba(236,185,57,0.2); border-color: rgba(236,185,57,0.5); }
-  .house-mini.r { background: rgba(14,26,64,0.5); border-color: rgba(148,107,45,0.5); }
-  .house-mini.s { background: rgba(26,71,42,0.3); border-color: rgba(170,170,170,0.5); }
-  .house-mini .hmoji { font-size: 24px; display: block; margin-bottom: 4px; }
-  .house-mini .hname { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; display: block; }
-  .house-mini.g .hname { color: var(--gryffindor-accent); }
-  .house-mini.h .hname { color: var(--hufflepuff-primary); }
-  .house-mini.r .hname { color: var(--ravenclaw-accent); }
-  .house-mini.s .hname { color: var(--slytherin-accent); }
+  .prophecy{margin-top:16px;width:100%;padding:22px 20px;border-radius:18px;text-align:center;position:relative;overflow:hidden;
+    background:radial-gradient(120% 100% at 50% 0%,rgba(var(--accent-rgb),.22),rgba(12,10,18,.95) 70%);border:1px solid rgba(var(--accent-rgb),.4)}
+  .prophecy .date{font:500 12px var(--en);letter-spacing:2px;color:var(--muted)}
+  .lang-th .prophecy .date{font-family:var(--th)}
+  .spell{font:700 26px var(--en);margin:10px 0 4px;color:var(--gold-l);text-shadow:0 0 18px rgba(212,175,55,.5)}
+  .spell-desc{font-style:italic;color:var(--muted);font-size:15px}
+  .lang-th .spell-desc{font-style:normal;font-size:13px}
+  .prophecy blockquote{margin-top:14px;font:italic 19px/1.5 var(--serif);color:#fff}
+  .lang-th .prophecy blockquote{font:400 15px/1.7 var(--th)}
+  .lucky{display:flex;justify-content:center;gap:16px;margin-top:14px;font-size:13px;color:var(--muted)}
+  .lucky b{color:var(--accent-l);font-weight:600}
 
-  .start-btn {
-    width: 100%;
-    padding: 16px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    border-radius: 14px;
-    font-family: 'Cinzel', serif;
-    font-size: 15px;
-    letter-spacing: 3px;
-    color: var(--gold-light);
-    cursor: pointer;
-    transition: all 0.35s;
-    text-transform: uppercase;
-    position: relative;
-    overflow: hidden;
-  }
-  .start-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-    opacity: 0;
-    transition: opacity 0.35s;
-  }
-  .start-btn:hover { color: var(--bg-deep); }
-  .start-btn:hover::before { opacity: 1; }
-  .start-btn span { position: relative; z-index: 1; }
+  .desc{font-size:17px;line-height:1.65;text-align:center;color:var(--muted)}
+  .lang-th .desc{font-size:14px;line-height:1.8}
 
-  /* neon pulse when a house card was tapped */
-  .start-btn.neon {
-    border-color: var(--gold-light);
-    color: var(--gold-light);
-    animation: neonPulse 1.4s ease-in-out infinite;
-  }
-  .start-btn.neon::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 16px;
-    background: transparent;
-    border: 2px solid var(--gold-light);
-    opacity: 0;
-    animation: neonRing 1.4s ease-in-out infinite;
-    pointer-events: none;
-  }
-  @keyframes neonPulse {
-    0%,100% { box-shadow: 0 0 8px rgba(240,208,128,0.5), 0 0 20px rgba(240,208,128,0.3); }
-    50%      { box-shadow: 0 0 18px rgba(240,208,128,0.9), 0 0 40px rgba(240,208,128,0.5), 0 0 60px rgba(201,168,76,0.3); }
-  }
-  @keyframes neonRing {
-    0%   { transform: scale(1);   opacity: 0.6; }
-    100% { transform: scale(1.08); opacity: 0; }
-  }
+  .footer{margin-top:28px;text-align:center;padding-bottom:6px}
+  .footer a{display:inline-flex;flex-direction:column;gap:4px;color:var(--muted);text-decoration:none;padding:10px 16px;border-radius:12px;border:1px solid transparent;transition:.3s}
+  .footer a:active,.footer a:hover{border-color:var(--line);color:var(--gold-l)}
+  .footer .brand{font:700 12px var(--en);letter-spacing:5px;color:var(--gold)}
+  .footer .tag{font:300 12px var(--th)}
 
-  /* house-mini click highlight */
-  .house-mini.selected-house { transform: scale(1.07) !important; }
-  .house-mini.g.selected-house { border-color: #D3A625; box-shadow: 0 0 14px rgba(211,166,37,0.6); }
-  .house-mini.h.selected-house { border-color: #ECB939; box-shadow: 0 0 14px rgba(236,185,57,0.6); }
-  .house-mini.r.selected-house { border-color: #946B2D; box-shadow: 0 0 14px rgba(148,107,45,0.6); }
-  .house-mini.s.selected-house { border-color: #AAAAAA; box-shadow: 0 0 14px rgba(170,170,170,0.5); }
+  #toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translate(-50%,30px);z-index:70;opacity:0;pointer-events:none;
+    padding:12px 18px;border-radius:30px;background:rgba(12,10,18,.92);border:1px solid var(--line);color:var(--parch);font:500 14px var(--th);transition:.35s;white-space:nowrap}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
 
-  /* ── NEXT-BTN DISABLED STATE ── */
-  .next-btn.disabled-state {
-    opacity: 0.35;
-    pointer-events: none;
-    cursor: not-allowed;
-    filter: grayscale(0.4);
-  }
+  /* streak */
+  .streak{margin-top:8px;padding:5px 12px;border-radius:20px;font:500 12px var(--th);color:var(--accent-l);border:1px solid var(--line);background:rgba(var(--accent-rgb),.12)}
 
-  .result-wrap { text-align: center; }
-  .house-banner {
-    width: 100%;
-    border-radius: 20px;
-    padding: 32px 20px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-    border: 2px solid;
-    animation: bannerReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  }
-  @keyframes bannerReveal {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-  .house-banner.gryffindor { background: linear-gradient(145deg, #3D0000, #740001, #1A0000); border-color: var(--gryffindor-accent); box-shadow: 0 0 60px rgba(211,166,37,0.3), inset 0 0 40px rgba(116,0,1,0.5); }
-  .house-banner.hufflepuff { background: linear-gradient(145deg, #5C4000, #ECB939, #3A2800); border-color: var(--hufflepuff-accent); box-shadow: 0 0 60px rgba(236,185,57,0.4), inset 0 0 40px rgba(55,46,41,0.5); }
-  .house-banner.ravenclaw { background: linear-gradient(145deg, #050B1E, #0E1A40, #020510); border-color: var(--ravenclaw-accent); box-shadow: 0 0 60px rgba(148,107,45,0.3), inset 0 0 40px rgba(14,26,64,0.5); }
-  .house-banner.slytherin { background: linear-gradient(145deg, #081B10, #1A472A, #040D08); border-color: var(--slytherin-accent); box-shadow: 0 0 60px rgba(170,170,170,0.2), inset 0 0 40px rgba(26,71,42,0.5); }
+  /* patronus summon */
+  .relic{position:relative;overflow:hidden}
+  .mist{position:absolute;inset:0;display:grid;place-items:center;text-align:center;cursor:pointer;border-radius:16px;
+    background:radial-gradient(circle,rgba(200,220,255,.22),rgba(12,10,18,.97) 75%);
+    font:600 11px/1.6 var(--en);letter-spacing:2px;color:var(--accent-l);text-transform:uppercase;transition:opacity .9s,transform .9s,filter .9s;animation:breathe 2.4s ease-in-out infinite}
+  .lang-th .mist{font-family:var(--th);letter-spacing:0;font-size:13px}
+  .relic:not(.veiled) .mist{opacity:0;transform:scale(1.5);filter:blur(10px);pointer-events:none;animation:none}
+  .relic.pat:not(.veiled) .pico{animation:pop .9s cubic-bezier(.2,1.6,.4,1) both;filter:drop-shadow(0 0 16px rgba(200,230,255,.9))}
+  @keyframes breathe{50%{box-shadow:inset 0 0 30px rgba(200,220,255,.25)}}
 
-  .house-crest-big { font-size: 80px; display: block; margin-bottom: 12px; animation: crestSpin 1s cubic-bezier(0.34,1.56,0.64,1); filter: drop-shadow(0 0 20px currentColor); }
-  @keyframes crestSpin {
-    from { transform: rotateY(90deg) scale(0.5); opacity: 0; }
-    to { transform: rotateY(0deg) scale(1); opacity: 1; }
-  }
-  .house-result-name { font-family: 'Cinzel Decorative', serif; font-size: clamp(22px, 6vw, 32px); font-weight: 700; display: block; text-shadow: 0 0 20px currentColor; margin-bottom: 6px; }
-  .house-banner.gryffindor .house-result-name { color: var(--gryffindor-accent); }
-  .house-banner.hufflepuff .house-result-name { color: var(--hufflepuff-accent); }
-  .house-banner.ravenclaw .house-result-name { color: var(--ravenclaw-accent); }
-  .house-banner.slytherin .house-result-name { color: var(--slytherin-accent); }
-  .house-motto { font-family: 'Crimson Text', serif; font-style: italic; font-size: 14px; color: rgba(245,232,200,0.7); letter-spacing: 1px; }
+  /* hold-to-cast */
+  .cast-btn{position:relative;display:block;width:112px;height:112px;margin:18px auto 10px;border-radius:50%;border:0;cursor:pointer;
+    background:radial-gradient(circle,rgba(var(--accent-rgb),.35),transparent 70%);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  .cast-btn svg{position:absolute;inset:0;transform:rotate(-90deg)}
+  .cast-btn .trk{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4}
+  .cast-btn .prg{fill:none;stroke:var(--gold-l);stroke-width:5;stroke-linecap:round;stroke-dasharray:276.5;stroke-dashoffset:276.5;filter:drop-shadow(0 0 6px var(--gold))}
+  .cast-btn span{font-size:42px;display:inline-block;transition:transform .3s}
+  .cast-btn.charging span{animation:pulse .45s ease-in-out infinite;transform:rotate(-20deg)}
+  .prophecy:not(.cast) .ph-body{display:none}
+  .prophecy.cast .cast-btn,.prophecy.cast .cast-hint{display:none}
+  .ph-body{animation:enter .8s both}
 
-  .traits-section { margin-bottom: 20px; }
-  .traits-title { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px; color: var(--gold-dark); text-transform: uppercase; margin-bottom: 12px; }
-  .traits-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-  .trait-pill {
-    background: rgba(201,168,76,0.1);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-family: 'Crimson Text', 'Kanit', serif;
-    font-size: 14px;
-    color: var(--gold-light);
-    animation: pillPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-  }
-  @keyframes pillPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  /* sparks */
+  .spark{position:fixed;z-index:65;width:6px;height:6px;margin:-3px;border-radius:50%;background:var(--gold-l);box-shadow:0 0 10px var(--gold);pointer-events:none;animation:spark .9s ease-out forwards}
+  @keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
 
-  .house-desc { font-family: 'Crimson Text', 'Kanit', serif; font-size: 17px; line-height: 1.7; color: rgba(245,232,200,0.85); text-align: center; margin-bottom: 20px; }
+  /* mini-game */
+  .game{position:fixed;inset:0;z-index:55;touch-action:none;animation:enter .4s both;
+    background:radial-gradient(120% 80% at 50% 0%,rgba(var(--accent-rgb),.28),rgba(7,6,12,.97) 60%)}
+  .game canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ghud{position:absolute;top:calc(14px + var(--safe-t));left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;
+    font:600 12px var(--en);letter-spacing:1.5px;color:var(--muted)}
+  .lang-th .ghud{font-family:var(--th);letter-spacing:0}
+  .ghud b{color:var(--gold-l);font:700 22px var(--en);margin-left:6px}
+  .ghud button{pointer-events:auto;width:42px;height:42px;border-radius:50%;background:rgba(10,9,16,.6);border:1px solid var(--line);color:var(--accent-l);font-size:16px;cursor:pointer}
+  .gend{position:absolute;inset:0;margin:auto;height:fit-content;width:min(340px,88vw);padding:28px 22px;border-radius:20px;text-align:center;
+    background:rgba(14,12,22,.95);border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6);animation:enter .5s both}
+  .gend[hidden]{display:none}
+  .gscore{font:900 68px/1 var(--en);color:var(--gold-l);text-shadow:0 0 24px rgba(212,175,55,.6);margin:10px 0}
 
-  .result-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .game.hit-bad{animation:shake .35s,redflash .45s}
+  .game.hit-good{animation:goodflash .3s}
+  @keyframes redflash{0%{box-shadow:inset 0 0 120px 30px rgba(255,30,70,.65)}100%{box-shadow:inset 0 0 0 0 transparent}}
+  @keyframes goodflash{0%{box-shadow:inset 0 0 90px 10px rgba(var(--accent-rgb),.35)}100%{box-shadow:inset 0 0 0 0 transparent}}
+  .ghud b.bump{display:inline-block;animation:bump .3s}
+  @keyframes bump{40%{transform:scale(1.5);color:#fff}}
+  .gscore.done{animation:bump .5s}
+  .game .gend .btn{margin-top:0}
+  .game .gend #gshare{margin-top:16px}
 
-  .share-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08));
-    border: 1px solid rgba(201,168,76,0.6);
-    border-radius: 12px;
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    letter-spacing: 2px;
-    color: var(--gold-light);
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-  .share-btn:hover { background: linear-gradient(135deg, rgba(201,168,76,0.3), rgba(201,168,76,0.15)); border-color: var(--gold-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.25); }
-  .share-btn:active { transform: scale(0.98); }
-  .share-btn svg { flex-shrink: 0; }
-  .share-btn.loading { opacity: 0.7; pointer-events: none; cursor: default; }
-  .share-btn .share-spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(201,168,76,0.3); border-top-color: var(--gold-light); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
-  .share-btn.loading .share-spinner { display: block; }
-  .share-btn.loading .share-icon { display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .sheet{position:fixed;inset:0;z-index:58;display:grid;place-items:center;padding:20px;background:rgba(3,2,8,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:enter .35s both}
+  .sbox{width:min(400px,100%);max-height:86vh;overflow:auto;padding:24px 18px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(28,24,40,.98),rgba(12,10,18,.98));border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .board{list-style:none}
+  .board li{display:flex;align-items:center;gap:12px;padding:11px 12px;margin-bottom:8px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);animation:enter .5s both}
+  .board li.me{border-color:var(--gold);background:rgba(212,175,55,.12);box-shadow:0 0 22px rgba(212,175,55,.25)}
+  .board b{width:30px;text-align:center;font:700 16px var(--en);color:var(--accent-l)}
+  .board .bn{flex:1;font:600 16px var(--serif);color:#fff;display:flex;flex-direction:column;line-height:1.25;min-width:0;overflow-wrap:anywhere}
+  .lang-th .board .bn{font:500 14px var(--th)}
+  .board small{font:400 11px var(--th);color:var(--muted)}
+  .board em{font:700 20px var(--en);font-style:normal;color:var(--gold-l)}
 
-  .download-btn {
-    width: 100%;
-    padding: 14px;
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.45);
-    border-radius: 12px;
-    font-family: 'Kanit', 'Cinzel', serif;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    color: var(--gold-light);
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-  .download-btn:hover { border-color: var(--gold-light); background: rgba(201,168,76,0.08); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(201,168,76,0.15); }
-  .download-btn:active { transform: scale(0.98); }
-  .download-btn.loading { opacity: 0.6; pointer-events: none; }
-  .download-btn .dl-spinner { display: none; width: 15px; height: 15px; border: 2px solid rgba(201,168,76,0.3); border-top-color: var(--gold-light); border-radius: 50%; animation: spin 0.7s linear infinite; }
-  .download-btn.loading .dl-spinner { display: block; }
-  .download-btn.loading .dl-icon { display: none; }
-
-  .retry-btn {
-    width: 100%;
-    padding: 14px;
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.25);
-    border-radius: 12px;
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 2px;
-    color: rgba(201,168,76,0.6);
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-  }
-  .retry-btn:hover { border-color: rgba(201,168,76,0.5); color: var(--gold); background: rgba(201,168,76,0.05); }
-
-  #toast {
-    position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: rgba(20,16,36,0.96);
-    border: 1px solid rgba(201,168,76,0.5);
-    border-radius: 40px;
-    padding: 12px 24px;
-    font-family: 'Kanit', 'Crimson Text', serif;
-    font-size: 14px;
-    color: var(--gold-light);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 999;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(201,168,76,0.15);
-    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    white-space: nowrap;
-  }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  #toast.hide { opacity: 0; transform: translateX(-50%) translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
-
-  .ornament { display: flex; align-items: center; gap: 10px; margin: 16px 0; opacity: 0.5; }
-  .ornament-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
-  .ornament-line:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
-  .ornament-diamond { color: var(--gold); font-size: 10px; }
-
-  .screen { animation: fadeIn 0.5s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-  .sorting-hat-screen { text-align: center; padding: 40px 20px; }
-  .hat-emoji { font-size: 72px; display: block; animation: hatWiggle 0.6s ease-in-out infinite alternate; margin-bottom: 16px; }
-  @keyframes hatWiggle { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(5deg) scale(1.05); } }
-  .thinking-dots { font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 4px; color: var(--gold); animation: pulse 1s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  .score-bars { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
-  .score-bar-item { display: flex; align-items: center; gap: 8px; }
-  .score-bar-label { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; width: 80px; text-align: right; color: rgba(245,232,200,0.7); }
-  .score-bar-bg { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
-  .score-bar-fg { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); width: 0%; }
-  .sbg { background: linear-gradient(90deg, #740001, #D3A625); }
-  .sbh { background: linear-gradient(90deg, #372E29, #ECB939); }
-  .sbr { background: linear-gradient(90deg, #0E1A40, #946B2D); }
-  .sbs { background: linear-gradient(90deg, #1A472A, #AAAAAA); }
-
-  @media (min-width: 480px) {
-    #app { padding: 24px 20px 60px; }
-    .question-text { font-size: 22px; }
-  }
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
-<body>
-
-<canvas id="stars-canvas"></canvas>
-<div id="toast"></div>
-<button id="lang-btn">TH / EN</button>
-<div id="app"></div>
+<body class="lang-th">
+<canvas id="dust"></canvas>
+<div class="vignette"></div>
+<button class="fab" id="lang-btn" aria-label="Switch language">EN</button>
+<button class="fab" id="sound-btn" aria-label="Toggle music" aria-pressed="false">
+  <span class="wave"><i></i><i></i><i></i><i></i></span>
+  <svg class="mute" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+</button>
+<div class="flash" id="flash"></div>
+<div id="toast" role="status"></div>
+<main id="app"></main>
 
 <script>
-const LANG = { current: 'en' };
+(() => {
+'use strict';
 
+/* ───────────── CONFIG ───────────── */
+const RICHER_URL = 'https://www.instagram.com/ncs.fes_th/';
+const MUSIC_SRC  = 'sound/hogwartBGSound.mp3';
+const STORE_KEY  = 'richer_sorting_v1';
+const HOUSES = ['valor','loyal','wisdom','ambit'];
+
+/* ───────────── HOUSES (original names, same four temperaments) ───────────── */
+const HOUSE_META = {
+  valor:  { emoji:'🦁', c1:'#C0262D', c2:'#E8C15A', bg:['#1a0306','#4a0a0f','#260407'] },
+  loyal:  { emoji:'🦡', c1:'#E0A526', c2:'#1c1712', bg:['#140f05','#3d2d0a','#1c1608'] },
+  wisdom: { emoji:'🦅', c1:'#2F5BD3', c2:'#C8935A', bg:['#03061a','#0d1a48','#060b26'] },
+  ambit:  { emoji:'🐍', c1:'#1F8A4C', c2:'#C9D1D6', bg:['#020c06','#0c3a20','#04150b'] }
+};
+
+/* ───────────── TEXT ───────────── */
 const TEXT = {
   en: {
-    title: "The Sorting Hat",
-    subtitle: "Hogwarts School of Witchcraft & Wizardry",
-    introDesc: "Answer 5 questions truthfully. The Sorting Hat will reveal your true Hogwarts house.",
-    start: "✦ Begin the Sorting ✦",
-    questionLabel: q => `Question ${q} of 5`,
-    next: "Continue ⟶",
-    sortingTitle: "The Sorting Hat Deliberates...",
-    sortingLabel: "Examining your soul",
-    revealLabel: "✦ The Sorting Hat Declares ✦",
-    retakeLabel: "↺  Retake the Sorting",
-    traitsLabel: "Your traits",
-    houses: {
-      gryffindor: { name: "Gryffindor", motto: "Brave of Heart, Strong of Soul", desc: "You belong in Gryffindor — the house of courage, bravery, and nerve. You charge into challenges head-on, defend others without hesitation, and lead by example. The lion's spirit runs in your blood." },
-      hufflepuff:  { name: "Hufflepuff",  motto: "Loyal, Patient, True",           desc: "You belong in Hufflepuff — the house of loyalty, patience, and hard work. You are dependable, kind-hearted, and fair to everyone. Your warmth and dedication make the world a better place." },
-      ravenclaw:   { name: "Ravenclaw",   motto: "Wit, Wisdom, Wonder",            desc: "You belong in Ravenclaw — the house of wit, wisdom, and creativity. You crave knowledge, think deeply before acting, and see the world in ways others miss. The pursuit of truth is your greatest quest." },
-      slytherin:   { name: "Slytherin",   motto: "Ambitious, Cunning, Proud",      desc: "You belong in Slytherin — the house of ambition, cunning, and resourcefulness. You know what you want and have the cleverness and drive to get it. Your determination and strategic mind set you apart." }
+    school:'Richer Academy of Arcane Arts',
+    title:'The Sorting Ceremony',
+    introDesc:'Five questions. One truth. The ancient Sorting Charm will read your soul and reveal the house where you belong.',
+    nameLabel:'Your Wizard / Witch Name', namePh:'Enter your name…', nameErr:'The Hall must know your name ✦',
+    start:'Enter the Great Hall',
+    q:(n)=>`Question ${n} of 5`, next:'Continue', reveal:'Reveal My House',
+    sortWords:['Reading your heart…','Weighing your courage…','Measuring your wit…','Testing your loyalty…','The Charm has chosen!'],
+    declares:'The Sorting Charm Declares',
+    acceptEye:'Letter of Acceptance', dear:'Dear',
+    accept:(h)=>`We are pleased to inform you that you have been accepted into the Richer Academy of Arcane Arts and sorted into the noble House of ${h}. Your wand awaits, and the castle doors are open.`,
+    headmaster:'— The Headmistress', relics:'Your Magical Relics',
+    wand:'Wand', patronus:'Patronus', wood:'Wood', core:'Core', length:'Length', flex:'Flex',
+    inches:'in', spirit:'Your guardian spirit',
+    today:"Today's Charm & Prophecy", luckyNum:'Lucky №', luckyCol:'Colour',
+    returnNote:'Tap your keychain again tomorrow for a new prophecy ✦',
+    about:'About your house',
+    save:'Save ID Card', share:'Invite a Friend', retake:'Retake the Sorting',
+    saved:'ID card saved ✨', shareText:(n,h)=>`${n} was sorted into House ${h}! Discover yours ✦`, copied:'Link copied ✨',
+    idTitle:'STUDENT IDENTIFICATION', idNo:'ID №', footer:'Gift a magical keychain to your housemates',
+    holdCast:"Press & hold the wand to cast today's charm", summon:'Tap to summon',
+    game:'Catch Falling Stars', gameDesc:'Tap golden stars & comets for house points — but beware the cursed orbs!',
+    points:'House Points', best:'Best', play:'✦ Play ✦', again:'Play Again', close:'Close', newBest:'New Record!',
+    streak:(n)=>`Visit streak · Day ${n}`,
+    board:'Leaderboard', boardBtn:'🏆 Leaderboard', noScores:'No scores yet — be the first to play!', share2:'Share Score', rank:(n)=>`Rank #${n}`, you:'You',
+    shareScore:(n,h,s)=>`${n} of House ${h} scored ${s} points catching stars ✨ Can you beat me?`,
+    houses:{
+      valor:{name:'Valoris', motto:'Brave of Heart, Strong of Soul', desc:'You belong in Valoris — the house of courage, bravery, and nerve. You charge into challenges head-on, defend others without hesitation, and lead by example. The lion\'s spirit runs in your blood.'},
+      loyal:{name:'Fidelis', motto:'Loyal, Patient, True', desc:'You belong in Fidelis — the house of loyalty, patience, and hard work. You are dependable, kind-hearted, and fair to everyone. Your warmth and dedication make the world a better place.'},
+      wisdom:{name:'Sapientia', motto:'Wit, Wisdom, Wonder', desc:'You belong in Sapientia — the house of wit, wisdom, and creativity. You crave knowledge, think deeply before acting, and see the world in ways others miss. The pursuit of truth is your greatest quest.'},
+      ambit:{name:'Ambitio', motto:'Ambitious, Cunning, Proud', desc:'You belong in Ambitio — the house of ambition, cunning, and resourcefulness. You know what you want and have the cleverness and drive to get it. Your determination and strategic mind set you apart.'}
     },
-    traits: {
-      gryffindor: ["Brave","Daring","Chivalrous","Determined","Bold"],
-      hufflepuff:  ["Loyal","Patient","Kind","Hardworking","Fair"],
-      ravenclaw:   ["Wise","Creative","Curious","Analytical","Witty"],
-      slytherin:   ["Ambitious","Cunning","Resourceful","Strategic","Proud"]
-    },
-    questions: [
-      { icon:"⚔️", text:"Which quality do you value MOST in yourself?", opts:[
-        {text:"Courage — I face my fears head-on, no matter the risk.", house:'gryffindor'},
-        {text:"Loyalty — I stand by the people I love, no matter what.", house:'hufflepuff'},
-        {text:"Intelligence — I think before I act and love to learn.", house:'ravenclaw'},
-        {text:"Ambition — I know what I want and I'm driven to get it.", house:'slytherin'}
-      ]},
-      { icon:"🔮", text:"You discover a powerful magical artifact. What do you do?", opts:[
-        {text:"Use it to protect others from danger right away.", house:'gryffindor'},
-        {text:"Share it fairly so everyone benefits equally.", house:'hufflepuff'},
-        {text:"Study it thoroughly to understand its true nature.", house:'ravenclaw'},
-        {text:"Secure it — such power should be in capable hands.", house:'slytherin'}
-      ]},
-      { icon:"🌙", text:"It's a perfect free evening. What do you do?", opts:[
-        {text:"Go on a spontaneous adventure with my closest friends.", house:'gryffindor'},
-        {text:"Host a cozy gathering and make everyone feel welcome.", house:'hufflepuff'},
-        {text:"Dive into a fascinating book or explore a new idea.", house:'ravenclaw'},
-        {text:"Plan my next big move and work toward my goals.", house:'slytherin'}
-      ]},
-      { icon:"🌊", text:"Your deepest fear is...", opts:[
-        {text:"Being seen as a coward who let others down.", house:'gryffindor'},
-        {text:"Losing the people I care about or failing to protect them.", house:'hufflepuff'},
-        {text:"Being ignorant — to miss something important because I didn't think enough.", house:'ravenclaw'},
-        {text:"Failure. Being ordinary, forgotten, and leaving no legacy.", house:'slytherin'}
-      ]},
-      { icon:"⚡", text:"When you face a difficult conflict, you...", opts:[
-        {text:"Charge in — I confront it directly and defend what's right.", house:'gryffindor'},
-        {text:"Try to mediate — I find common ground and keep the peace.", house:'hufflepuff'},
-        {text:"Analyze it — I find the most logical, fair resolution possible.", house:'ravenclaw'},
-        {text:"Strategize — I turn the situation to my advantage.", house:'slytherin'}
-      ]}
+    traits:{ valor:['Brave','Daring','Chivalrous','Determined','Bold'], loyal:['Loyal','Patient','Kind','Hardworking','Fair'], wisdom:['Wise','Creative','Curious','Analytical','Witty'], ambit:['Ambitious','Cunning','Resourceful','Strategic','Proud'] },
+    questions:[
+      {icon:'⚔️',text:'Which quality do you value MOST in yourself?',opts:[
+        {text:'Courage — I face my fears head-on, no matter the risk.',house:'valor'},
+        {text:'Loyalty — I stand by the people I love, no matter what.',house:'loyal'},
+        {text:'Intelligence — I think before I act and love to learn.',house:'wisdom'},
+        {text:"Ambition — I know what I want and I'm driven to get it.",house:'ambit'}]},
+      {icon:'🔮',text:'You discover a powerful magical artifact. What do you do?',opts:[
+        {text:'Use it to protect others from danger right away.',house:'valor'},
+        {text:'Share it fairly so everyone benefits equally.',house:'loyal'},
+        {text:'Study it thoroughly to understand its true nature.',house:'wisdom'},
+        {text:'Secure it — such power should be in capable hands.',house:'ambit'}]},
+      {icon:'🌙',text:"It's a perfect free evening. What do you do?",opts:[
+        {text:'Go on a spontaneous adventure with my closest friends.',house:'valor'},
+        {text:'Host a cozy gathering and make everyone feel welcome.',house:'loyal'},
+        {text:'Dive into a fascinating book or explore a new idea.',house:'wisdom'},
+        {text:'Plan my next big move and work toward my goals.',house:'ambit'}]},
+      {icon:'🌊',text:'Your deepest fear is...',opts:[
+        {text:'Being seen as a coward who let others down.',house:'valor'},
+        {text:'Losing the people I care about or failing to protect them.',house:'loyal'},
+        {text:"Being ignorant — to miss something important because I didn't think enough.",house:'wisdom'},
+        {text:'Failure. Being ordinary, forgotten, and leaving no legacy.',house:'ambit'}]},
+      {icon:'⚡',text:'When you face a difficult conflict, you...',opts:[
+        {text:"Charge in — I confront it directly and defend what's right.",house:'valor'},
+        {text:'Try to mediate — I find common ground and keep the peace.',house:'loyal'},
+        {text:'Analyze it — I find the most logical, fair resolution possible.',house:'wisdom'},
+        {text:'Strategize — I turn the situation to my advantage.',house:'ambit'}]}
     ]
   },
   th: {
-    title: "หมวกคัดสรร",
-    subtitle: "โรงเรียนฮอกวอตส์แห่งเวทมนตร์และเวทยาคม",
-    introDesc: "ตอบ 5 คำถามอย่างซื่อสัตย์ หมวกคัดสรรจะเปิดเผยบ้านที่แท้จริงของคุณ",
-    start: "✦ เริ่มการคัดสรร ✦",
-    questionLabel: q => `คำถามที่ ${q} จากทั้งหมด 5`,
-    next: "ถัดไป ⟶",
-    sortingTitle: "หมวกคัดสรรกำลังพิจารณา...",
-    sortingLabel: "กำลังตรวจสอบจิตวิญญาณของคุณ",
-    revealLabel: "✦ หมวกคัดสรรประกาศ ✦",
-    retakeLabel: "↺  ทำแบบทดสอบใหม่",
-    traitsLabel: "ลักษณะนิสัยของคุณ",
-    houses: {
-      gryffindor: { name:"กริฟฟินดอร์",  motto:"กล้าหาญ มีหัวใจ แข็งแกร่ง",       desc:"คุณเป็นของกริฟฟินดอร์ — บ้านแห่งความกล้าหาญ ความมุ่งมั่น และจิตใจที่แน่วแน่ คุณพร้อมเผชิญความท้าทายโดยตรง ปกป้องผู้อื่นโดยไม่ลังเล และเป็นผู้นำด้วยตัวอย่าง วิญญาณของสิงโตไหลเวียนอยู่ในสายเลือดคุณ" },
-      hufflepuff:  { name:"ฮัฟเฟิลพัฟฟ์", motto:"ซื่อสัตย์ อดทน และจริงใจ",        desc:"คุณเป็นของฮัฟเฟิลพัฟฟ์ — บ้านแห่งความจงรักภักดี ความอดทน และความขยันหมั่นเพียร คุณน่าไว้วางใจ ใจดี และปฏิบัติต่อทุกคนอย่างเป็นธรรม ความอบอุ่นและความทุ่มเทของคุณทำให้โลกดีขึ้น" },
-      ravenclaw:   { name:"เรเวนคลอว์",   motto:"ปัญญา ความรู้ ความสงสัยใคร่รู้",  desc:"คุณเป็นของเรเวนคลอว์ — บ้านแห่งสติปัญญา ความฉลาด และความคิดสร้างสรรค์ คุณกระหายความรู้ คิดอย่างลึกซึ้ง และมองโลกในมุมที่คนอื่นมองข้าม การแสวงหาความจริงคือพันธกิจยิ่งใหญ่ของคุณ" },
-      slytherin:   { name:"สลิธีรีน",     motto:"ทะเยอทะยาน แยบยล และภาคภูมิใจ",  desc:"คุณเป็นของสลิธีรีน — บ้านแห่งความทะเยอทะยาน ความแยบยล และทรัพยากรที่ชาญฉลาด คุณรู้ดีว่าต้องการอะไรและมีความฉลาดและแรงขับดันเพื่อบรรลุเป้าหมาย ความมุ่งมั่นและจิตใจเชิงกลยุทธ์ทำให้คุณโดดเด่น" }
+    school:'สถาบันศาสตร์เวทโบราณริชเชอร์',
+    title:'พิธีคัดสรรบ้าน',
+    introDesc:'ห้าคำถาม หนึ่งความจริง มนตร์คัดสรรโบราณจะอ่านจิตวิญญาณของคุณ และเผยบ้านที่คุณควรอยู่',
+    nameLabel:'ชื่อพ่อมด / แม่มดของคุณ', namePh:'พิมพ์ชื่อของคุณ…', nameErr:'ห้องโถงใหญ่ต้องรู้จักชื่อคุณก่อน ✦',
+    start:'ก้าวเข้าสู่ห้องโถงใหญ่',
+    q:(n)=>`คำถามที่ ${n} จาก 5`, next:'ถัดไป', reveal:'เผยบ้านของฉัน',
+    sortWords:['กำลังอ่านหัวใจของคุณ…','ชั่งน้ำหนักความกล้า…','วัดระดับปัญญา…','ทดสอบความภักดี…','มนตร์ได้ตัดสินแล้ว!'],
+    declares:'มนตร์คัดสรรประกาศ',
+    acceptEye:'จดหมายตอบรับเข้าศึกษา', dear:'เรียนคุณ',
+    accept:(h)=>`ด้วยความยินดี ขอแจ้งให้ทราบว่าคุณได้รับการตอบรับเข้าศึกษา ณ สถาบันศาสตร์เวทโบราณริชเชอร์ และได้รับการคัดสรรสู่บ้าน${h}อันทรงเกียรติ ไม้กายสิทธิ์ของคุณรออยู่ และประตูปราสาทได้เปิดต้อนรับแล้ว`,
+    headmaster:'— ครูใหญ่แห่งสถาบัน', relics:'ของวิเศษประจำตัวคุณ',
+    wand:'ไม้กายสิทธิ์', patronus:'ผู้พิทักษ์', wood:'เนื้อไม้', core:'แกน', length:'ความยาว', flex:'ความยืดหยุ่น',
+    inches:'นิ้ว', spirit:'วิญญาณผู้คุ้มครองของคุณ',
+    today:'คาถาและคำพยากรณ์ประจำวัน', luckyNum:'เลขนำโชค', luckyCol:'สีมงคล',
+    returnNote:'แตะพวงกุญแจอีกครั้งพรุ่งนี้ เพื่อรับคำพยากรณ์ใหม่ ✦',
+    about:'เกี่ยวกับบ้านของคุณ',
+    save:'บันทึกบัตรนักเรียน', share:'ชวนเพื่อนมาคัดสรร', retake:'ทำแบบทดสอบใหม่',
+    saved:'บันทึกบัตรเรียบร้อย ✨', shareText:(n,h)=>`${n} ได้อยู่บ้าน${h}! มาค้นหาบ้านของคุณกัน ✦`, copied:'คัดลอกลิงก์แล้ว ✨',
+    idTitle:'บัตรประจำตัวนักเรียน', idNo:'รหัส', footer:'มอบพวงกุญแจเวทมนตร์ให้เพื่อนร่วมบ้านของคุณ',
+    holdCast:'กดค้างที่ไม้กายสิทธิ์ เพื่อร่ายคาถาประจำวัน', summon:'แตะเพื่อเรียก',
+    game:'เก็บดวงดาวร่วงหล่น', gameDesc:'แตะดาวทองและดาวหางเพื่อสะสมแต้มบ้าน — ระวังลูกแก้วต้องสาป!',
+    points:'แต้มบ้าน', best:'สูงสุด', play:'✦ เริ่มเล่น ✦', again:'เล่นอีกครั้ง', close:'ปิด', newBest:'สถิติใหม่!',
+    streak:(n)=>`มาเยือนต่อเนื่อง · วันที่ ${n}`,
+    board:'ตารางคะแนน', boardBtn:'🏆 ตารางคะแนน', noScores:'ยังไม่มีคะแนน — มาเป็นคนแรกเลย!', share2:'แชร์คะแนน', rank:(n)=>`อันดับ ${n}`, you:'คุณ',
+    shareScore:(n,h,s)=>`${n} จากบ้าน${h} ทำได้ ${s} แต้มในเกมเก็บดาว ✨ กล้ามาท้าไหม?`,
+    houses:{
+      valor:{name:'วาโลริส', motto:'กล้าหาญ มีหัวใจ แข็งแกร่ง', desc:'คุณเป็นของวาโลริส — บ้านแห่งความกล้าหาญ ความมุ่งมั่น และจิตใจที่แน่วแน่ คุณพร้อมเผชิญความท้าทายโดยตรง ปกป้องผู้อื่นโดยไม่ลังเล และเป็นผู้นำด้วยตัวอย่าง วิญญาณของสิงโตไหลเวียนอยู่ในสายเลือดคุณ'},
+      loyal:{name:'ฟิเดลิส', motto:'ซื่อสัตย์ อดทน และจริงใจ', desc:'คุณเป็นของฟิเดลิส — บ้านแห่งความจงรักภักดี ความอดทน และความขยันหมั่นเพียร คุณน่าไว้วางใจ ใจดี และปฏิบัติต่อทุกคนอย่างเป็นธรรม ความอบอุ่นและความทุ่มเทของคุณทำให้โลกดีขึ้น'},
+      wisdom:{name:'ซาเปียนเทีย', motto:'ปัญญา ความรู้ ความสงสัยใคร่รู้', desc:'คุณเป็นของซาเปียนเทีย — บ้านแห่งสติปัญญา ความฉลาด และความคิดสร้างสรรค์ คุณกระหายความรู้ คิดอย่างลึกซึ้ง และมองโลกในมุมที่คนอื่นมองข้าม การแสวงหาความจริงคือพันธกิจยิ่งใหญ่ของคุณ'},
+      ambit:{name:'แอมบิทิโอ', motto:'ทะเยอทะยาน แยบยล และภาคภูมิใจ', desc:'คุณเป็นของแอมบิทิโอ — บ้านแห่งความทะเยอทะยาน ความแยบยล และไหวพริบ คุณรู้ดีว่าต้องการอะไร และมีทั้งความฉลาดและแรงขับเคลื่อนที่จะไปถึง ความมุ่งมั่นและจิตใจเชิงกลยุทธ์ทำให้คุณโดดเด่น'}
     },
-    traits: {
-      gryffindor: ["กล้าหาญ","ฉลาดล้ำ","อัศวิน","มุ่งมั่น","กล้า"],
-      hufflepuff:  ["ซื่อสัตย์","อดทน","ใจดี","ขยันหมั่นเพียร","ยุติธรรม"],
-      ravenclaw:   ["ฉลาดปราดเปรื่อง","สร้างสรรค์","ช่างสงสัย","วิเคราะห์","เฉลียวฉลาด"],
-      slytherin:   ["ทะเยอทะยาน","แยบยล","ประหยัดทรัพยากร","มีกลยุทธ์","ภาคภูมิใจ"]
-    },
-    questions: [
-      { icon:"⚔️", text:"คุณให้คุณค่ากับสิ่งใดมากที่สุดในตัวเอง?", opts:[
-        {text:"ความกล้าหาญ — ฉันเผชิญกับความกลัวโดยตรง ไม่ว่าจะเสี่ยงแค่ไหน", house:'gryffindor'},
-        {text:"ความซื่อสัตย์ — ฉันยืนหยัดเคียงข้างคนที่รัก ไม่ว่าจะเกิดอะไรขึ้น", house:'hufflepuff'},
-        {text:"ปัญญา — ฉันคิดก่อนทำและชอบเรียนรู้สิ่งใหม่ๆ", house:'ravenclaw'},
-        {text:"ความทะเยอทะยาน — ฉันรู้ว่าต้องการอะไรและมุ่งมั่นจะได้มัน", house:'slytherin'}
-      ]},
-      { icon:"🔮", text:"คุณค้นพบวัตถุเวทมนตร์อันทรงพลัง คุณจะทำอะไร?", opts:[
-        {text:"ใช้มันปกป้องผู้อื่นจากอันตรายทันที", house:'gryffindor'},
-        {text:"แบ่งปันอย่างยุติธรรมเพื่อให้ทุกคนได้ประโยชน์เท่าเทียมกัน", house:'hufflepuff'},
-        {text:"ศึกษาอย่างละเอียดเพื่อเข้าใจธรรมชาติที่แท้จริง", house:'ravenclaw'},
-        {text:"เก็บรักษาไว้ — พลังงานเช่นนี้ควรอยู่ในมือที่มีความสามารถ", house:'slytherin'}
-      ]},
-      { icon:"🌙", text:"คืนที่ว่างสมบูรณ์แบบ คุณจะทำอะไร?", opts:[
-        {text:"ออกผจญภัยแบบไม่ได้วางแผนกับเพื่อนสนิท", house:'gryffindor'},
-        {text:"จัดงานเล็กๆ อบอุ่น และทำให้ทุกคนรู้สึกถูกต้อนรับ", house:'hufflepuff'},
-        {text:"อ่านหนังสือที่น่าสนใจหรือสำรวจแนวคิดใหม่ๆ", house:'ravenclaw'},
-        {text:"วางแผนก้าวต่อไปและมุ่งสู่เป้าหมายของตัวเอง", house:'slytherin'}
-      ]},
-      { icon:"🌊", text:"ความกลัวที่ลึกที่สุดของคุณคือ...", opts:[
-        {text:"ถูกมองว่าขี้ขลาดและทำให้ผู้อื่นผิดหวัง", house:'gryffindor'},
-        {text:"สูญเสียคนที่รักหรือไม่สามารถปกป้องพวกเขาได้", house:'hufflepuff'},
-        {text:"ความโง่เขลา — พลาดสิ่งสำคัญเพราะไม่คิดให้รอบคอบ", house:'ravenclaw'},
-        {text:"ความล้มเหลว การเป็นคนธรรมดา ถูกลืม และไม่ทิ้งมรดกใดไว้", house:'slytherin'}
-      ]},
-      { icon:"⚡", text:"เมื่อเผชิญกับความขัดแย้งที่ยากลำบาก คุณ...", opts:[
-        {text:"บุกเข้าหา — ฉันเผชิญโดยตรงและปกป้องสิ่งที่ถูกต้อง", house:'gryffindor'},
-        {text:"พยายามไกล่เกลี่ย — หาจุดร่วมและรักษาสันติภาพ", house:'hufflepuff'},
-        {text:"วิเคราะห์ — หาทางออกที่สมเหตุสมผลและยุติธรรมที่สุด", house:'ravenclaw'},
-        {text:"วางกลยุทธ์ — เปลี่ยนสถานการณ์ให้เป็นประโยชน์ต่อตัวเอง", house:'slytherin'}
-      ]}
+    traits:{ valor:['กล้าหาญ','ใจเด็ด','มีน้ำใจอัศวิน','มุ่งมั่น','องอาจ'], loyal:['ซื่อสัตย์','อดทน','ใจดี','ขยันหมั่นเพียร','ยุติธรรม'], wisdom:['ฉลาดปราดเปรื่อง','สร้างสรรค์','ช่างสงสัย','ช่างวิเคราะห์','เฉลียวฉลาด'], ambit:['ทะเยอทะยาน','แยบยล','มีไหวพริบ','มีกลยุทธ์','ภาคภูมิใจ'] },
+    questions:[
+      {icon:'⚔️',text:'คุณให้คุณค่ากับสิ่งใดมากที่สุดในตัวเอง?',opts:[
+        {text:'ความกล้าหาญ — ฉันเผชิญกับความกลัวโดยตรง ไม่ว่าจะเสี่ยงแค่ไหน',house:'valor'},
+        {text:'ความซื่อสัตย์ — ฉันยืนหยัดเคียงข้างคนที่รัก ไม่ว่าจะเกิดอะไรขึ้น',house:'loyal'},
+        {text:'ปัญญา — ฉันคิดก่อนทำและชอบเรียนรู้สิ่งใหม่ๆ',house:'wisdom'},
+        {text:'ความทะเยอทะยาน — ฉันรู้ว่าต้องการอะไรและมุ่งมั่นจะได้มัน',house:'ambit'}]},
+      {icon:'🔮',text:'คุณค้นพบวัตถุเวทมนตร์อันทรงพลัง คุณจะทำอะไร?',opts:[
+        {text:'ใช้มันปกป้องผู้อื่นจากอันตรายทันที',house:'valor'},
+        {text:'แบ่งปันอย่างยุติธรรมเพื่อให้ทุกคนได้ประโยชน์เท่าเทียมกัน',house:'loyal'},
+        {text:'ศึกษาอย่างละเอียดเพื่อเข้าใจธรรมชาติที่แท้จริง',house:'wisdom'},
+        {text:'เก็บรักษาไว้ — พลังเช่นนี้ควรอยู่ในมือที่มีความสามารถ',house:'ambit'}]},
+      {icon:'🌙',text:'คืนที่ว่างสมบูรณ์แบบ คุณจะทำอะไร?',opts:[
+        {text:'ออกผจญภัยแบบไม่ได้วางแผนกับเพื่อนสนิท',house:'valor'},
+        {text:'จัดงานเล็กๆ อบอุ่น และทำให้ทุกคนรู้สึกถูกต้อนรับ',house:'loyal'},
+        {text:'อ่านหนังสือที่น่าสนใจหรือสำรวจแนวคิดใหม่ๆ',house:'wisdom'},
+        {text:'วางแผนก้าวต่อไปและมุ่งสู่เป้าหมายของตัวเอง',house:'ambit'}]},
+      {icon:'🌊',text:'ความกลัวที่ลึกที่สุดของคุณคือ...',opts:[
+        {text:'ถูกมองว่าขี้ขลาดและทำให้ผู้อื่นผิดหวัง',house:'valor'},
+        {text:'สูญเสียคนที่รักหรือไม่สามารถปกป้องพวกเขาได้',house:'loyal'},
+        {text:'ความไม่รู้ — พลาดสิ่งสำคัญเพราะไม่คิดให้รอบคอบ',house:'wisdom'},
+        {text:'ความล้มเหลว การเป็นคนธรรมดา ถูกลืม และไม่ทิ้งมรดกใดไว้',house:'ambit'}]},
+      {icon:'⚡',text:'เมื่อเผชิญกับความขัดแย้งที่ยากลำบาก คุณ...',opts:[
+        {text:'บุกเข้าหา — ฉันเผชิญโดยตรงและปกป้องสิ่งที่ถูกต้อง',house:'valor'},
+        {text:'พยายามไกล่เกลี่ย — หาจุดร่วมและรักษาสันติภาพ',house:'loyal'},
+        {text:'วิเคราะห์ — หาทางออกที่สมเหตุสมผลและยุติธรรมที่สุด',house:'wisdom'},
+        {text:'วางกลยุทธ์ — เปลี่ยนสถานการณ์ให้เป็นประโยชน์ต่อตัวเอง',house:'ambit'}]}
     ]
   }
 };
 
-const HOUSE_COLORS = {
-  gryffindor: { bg:'linear-gradient(145deg,#740001,#D3A625,#740001)', emoji:'🦁' },
-  hufflepuff:  { bg:'linear-gradient(145deg,#372E29,#ECB939,#372E29)', emoji:'🦡' },
-  ravenclaw:   { bg:'linear-gradient(145deg,#0E1A40,#946B2D,#0E1A40)', emoji:'🦅' },
-  slytherin:   { bg:'linear-gradient(145deg,#1A472A,#AAAAAA,#1A472A)', emoji:'🐍' }
+/* ───────────── GENERATOR DATA [en, th] ───────────── */
+const WOODS = [['Ebony','ไม้มะเกลือ'],['Holly','ไม้ฮอลลี่'],['Yew','ไม้ยู'],['Elder','ไม้เอลเดอร์'],['Rowan','ไม้โรวัน'],['Cedar','ไม้ซีดาร์'],['Walnut','ไม้วอลนัท'],['Cherry','ไม้เชอร์รี่'],['Willow','ไม้หลิว'],['Ash','ไม้แอช'],['Hawthorn','ไม้ฮอว์ธอร์น'],['Vine','ไม้เถาองุ่น'],['Silver Birch','ไม้เบิร์ชเงิน'],['Blackthorn','ไม้แบล็กธอร์น'],['Teak','ไม้สัก'],['Rosewood','ไม้พะยูง']];
+const CORES = {
+  valor: [['Phoenix Feather','ขนนกฟีนิกซ์'],['Dragon Heartstring','เอ็นหัวใจมังกร'],['Firebird Plume','ขนนกเพลิง']],
+  loyal: [['Unicorn Hair','ขนยูนิคอร์น'],['Golden Honeycomb Wax','ขี้ผึ้งรวงทอง'],['Moonbadger Whisker','หนวดแบดเจอร์จันทรา']],
+  wisdom:[['Thunderbird Tail Feather','ขนหางนกสายฟ้า'],['Starlight Crystal','ผลึกแสงดาว'],['Owl Quill of the Seer','ขนนกฮูกแห่งผู้หยั่งรู้']],
+  ambit: [['Basilisk Scale','เกล็ดบาซิลิสก์'],['Dragon Heartstring','เอ็นหัวใจมังกร'],['Obsidian Serpent Fang','เขี้ยวงูออบซิเดียน']]
 };
+const FLEX = [['Unyielding','แข็งแกร่งไม่ยอมงอ'],['Rigid','ค่อนข้างแข็ง'],['Sturdy','มั่นคง'],['Surprisingly Swishy','พลิ้วไหวเกินคาด'],['Supple','ยืดหยุ่น'],['Quite Bendy','โค้งงอได้ดี']];
+const PATRONI = {
+  valor: [['Lion','สิงโต','🦁'],['Phoenix','ฟีนิกซ์','🐦‍🔥'],['Stag','กวางเขาใหญ่','🦌'],['Wolf','หมาป่า','🐺'],['Tiger','เสือ','🐅'],['Horse','ม้า','🐎']],
+  loyal: [['Badger','แบดเจอร์','🦡'],['Otter','นาก','🦦'],['Hare','กระต่ายป่า','🐇'],['Golden Retriever','โกลเด้นรีทรีฟเวอร์','🐕'],['Bear','หมี','🐻'],['Bee','ผึ้ง','🐝']],
+  wisdom:[['Eagle','อินทรี','🦅'],['Owl','นกฮูก','🦉'],['Swan','หงส์','🦢'],['Fox','จิ้งจอก','🦊'],['Dolphin','โลมา','🐬'],['Raven','นกเรเวน','🐦‍⬛']],
+  ambit: [['Serpent','อสรพิษ','🐍'],['Black Panther','เสือดำ','🐆'],['Dragon','มังกร','🐉'],['Hawk','เหยี่ยว','🦅'],['Scorpion','แมงป่อง','🦂'],['Lynx','ลิงซ์','🐈‍⬛']]
+};
+const SPELLS = [
+  ['Lumina Aurum','ลูมินา ออรุม','Golden light guides every choice you make today.','แสงทองนำทางทุกการตัดสินใจของคุณวันนี้'],
+  ['Fortuna Verto','ฟอร์ทูนา แวร์โต','Turns small setbacks into unexpected luck.','เปลี่ยนอุปสรรคเล็กๆ ให้กลายเป็นโชคไม่คาดฝัน'],
+  ['Cor Fortis','คอร์ ฟอร์ทิส','A charm of steady courage for hard conversations.','มนตร์แห่งความกล้าที่มั่นคง สำหรับบทสนทนาที่ยากลำบาก'],
+  ['Serenis Aqua','เซเรนิส อควา','Calms the mind like still water under moonlight.','สงบจิตใจดั่งผืนน้ำนิ่งใต้แสงจันทร์'],
+  ['Amicus Vinculum','อมิคุส วินคูลุม','Strengthens the bond with someone dear to you.','กระชับสายสัมพันธ์กับคนสำคัญของคุณ'],
+  ['Ingenium Flamma','อินเจเนียม ฟลัมมา','Sparks a brilliant idea when you least expect it.','จุดประกายไอเดียเจิดจรัสในยามที่คาดไม่ถึง'],
+  ['Prosperus Nexus','พรอสเปรุส เน็กซัส','Draws abundance and good fortune toward you.','ดึงดูดความมั่งคั่งและโชคลาภเข้าหาคุณ'],
+  ['Scutum Lucis','สคูตุม ลูซิส','A shield of light against negativity.','โล่แห่งแสงสว่าง ปกป้องคุณจากพลังลบ'],
+  ['Tempus Mitis','เทมปุส มิทิส','Time feels gentle; nothing need be rushed today.','เวลาอ่อนโยนลง วันนี้ไม่มีสิ่งใดต้องเร่งรีบ'],
+  ['Stella Votum','สเตลลา โวทุม','A wish whispered today has the stars listening.','คำอธิษฐานที่กระซิบวันนี้ ดวงดาวกำลังรับฟัง'],
+  ['Clavis Aperta','คลาวิส อาเพอร์ตา','Opens a door you thought was locked.','เปิดประตูที่คุณเคยคิดว่าถูกปิดตาย'],
+  ['Vox Aurea','วอกซ์ ออเรีย','Your words carry golden persuasion today.','ถ้อยคำของคุณวันนี้มีพลังโน้มน้าวดั่งทองคำ']
+];
+const PROPHECIES = [
+  ['A stranger\'s kindness will echo louder than you expect.','ความใจดีจากคนแปลกหน้าจะก้องกังวานมากกว่าที่คุณคิด'],
+  ['What you seek is closer than the last place you looked.','สิ่งที่คุณตามหาอยู่ใกล้กว่าที่ที่คุณเพิ่งมองหา'],
+  ['A message arrives that changes the colour of your week.','ข้อความหนึ่งกำลังมา และจะเปลี่ยนสีสันของสัปดาห์คุณ'],
+  ['Patience today plants a seed that blooms in gold.','ความอดทนวันนี้คือเมล็ดพันธุ์ที่จะผลิบานเป็นทอง'],
+  ['The stars favour bold beginnings — start the thing.','ดวงดาวเข้าข้างการเริ่มต้นอย่างกล้าหาญ — ลงมือเลย'],
+  ['An old friend thinks of you; let them know you remember.','เพื่อนเก่ากำลังคิดถึงคุณ ลองบอกให้เขารู้ว่าคุณก็ยังจำได้'],
+  ['A small coin of luck hides in an ordinary moment.','เหรียญแห่งโชคเล็กๆ ซ่อนอยู่ในช่วงเวลาธรรมดา'],
+  ['Trust the quiet voice; it has read the map already.','เชื่อเสียงเงียบในใจ เพราะมันอ่านแผนที่ไว้แล้ว'],
+  ['Your effort is being noticed by someone who matters.','ความพยายามของคุณกำลังถูกมองเห็นโดยคนสำคัญ'],
+  ['Rest is a spell too — cast it tonight without guilt.','การพักผ่อนก็คือคาถาหนึ่ง — ร่ายมันคืนนี้โดยไม่ต้องรู้สึกผิด'],
+  ['A choice you fear will reveal itself as a gift.','ทางเลือกที่คุณกลัวจะเผยตัวว่าเป็นของขวัญ'],
+  ['Laughter shared today becomes tomorrow\'s fond memory.','เสียงหัวเราะที่แบ่งปันวันนี้จะกลายเป็นความทรงจำอันงดงาม'],
+  ['The moon whispers: finish what you started.','จันทราแว่วกระซิบ: จงทำสิ่งที่เริ่มไว้ให้สำเร็จ'],
+  ['Golden doors open for those who knock twice.','ประตูทองจะเปิดให้ผู้ที่เคาะเป็นครั้งที่สอง']
+];
+const COLOURS = [['Gold','ทอง'],['Crimson','แดงชาด'],['Emerald','มรกต'],['Sapphire','ไพลิน'],['Amber','อำพัน'],['Silver','เงิน'],['Ivory','งาช้าง'],['Violet','ม่วง']];
 
-// ── STARS ──
-const canvas = document.getElementById('stars-canvas');
-const ctx = canvas.getContext('2d');
-let stars = [];
-function resizeCanvas() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; initStars(); }
-function initStars() {
-  stars=[];
-  for(let i=0;i<180;i++) stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.2,a:Math.random(),speed:Math.random()*0.005+0.002,phase:Math.random()*Math.PI*2});
-}
-function drawStars(t) {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  stars.forEach(s=>{ const a=s.a*(0.5+0.5*Math.sin(t*s.speed+s.phase)); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(255,240,200,${a})`; ctx.fill(); });
-  requestAnimationFrame(drawStars);
-}
-window.addEventListener('resize',resizeCanvas);
-resizeCanvas();
-requestAnimationFrame(drawStars);
+/* ───────────── UTILS ───────────── */
+const $ = (s, r=document) => r.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const haptic = p => { try { navigator.vibrate && navigator.vibrate(p); } catch(e){} };
+function hash(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function rng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const pick = (arr, r) => arr[Math.floor(r()*arr.length)];
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const todayKey = () => { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
+const store = {
+  get(){ try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch(e){ return null; } },
+  set(v){ try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch(e){} },
+  clear(){ try { localStorage.removeItem(STORE_KEY); } catch(e){} }
+};
+let toastT;
+function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2600); }
 
-// ── PARTICLES ──
-(function spawnParticles(){
-  for(let i=0;i<12;i++){
-    const p=document.createElement('div'); p.className='particle';
-    p.style.left=Math.random()*100+'vw';
-    p.style.animationDelay=(Math.random()*8)+'s';
-    p.style.animationDuration=(6+Math.random()*6)+'s';
-    p.style.width=p.style.height=(2+Math.random()*4)+'px';
-    document.body.appendChild(p);
+/* ───────────── STATE ───────────── */
+// daily visit streak (each NFC tap on a new day counts)
+const visit = (() => {
+  const s = store.get() || {}, k = todayKey();
+  if (s.lastDay === k) return s;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  const yk = `${y.getFullYear()}-${y.getMonth()+1}-${y.getDate()}`;
+  const n = { ...s, lastDay:k, streak: s.lastDay===yk ? (s.streak||1)+1 : 1 };
+  store.set(n); return n;
+})();
+const saved = store.get();
+let lang = (saved && saved.lang) || (/^th/i.test(navigator.language||'') ? 'th' : 'en');
+let state = { screen:'intro', name: saved?.name || '', q:0, selected:null, answers:[], result:null };
+if (saved && saved.result && Array.isArray(saved.answers) && saved.answers.length===5) {
+  Object.assign(state, { screen:'result', answers:saved.answers, result:saved.result });
+}
+const T = () => TEXT[lang];
+
+/* ───────────── GOLD DUST BACKGROUND ───────────── */
+const dust = (() => {
+  const cv=$('#dust'), cx=cv.getContext('2d'); let W,H,DPR,parts=[];
+  const N = () => Math.min(90, Math.round(innerWidth*innerHeight/9000));
+  function resize(){ DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; cx.setTransform(DPR,0,0,DPR,0,0); parts=Array.from({length:N()},()=>mk(true)); }
+  function mk(init){ return { x:Math.random()*W, y:init?Math.random()*H:H+10, r:Math.random()*1.6+.3, vy:-(Math.random()*.35+.08), vx:(Math.random()-.5)*.15, ph:Math.random()*6.28, tw:Math.random()*.03+.01, star:Math.random()<.35 }; }
+  let color='212,175,55';
+  function frame(){
+    cx.clearRect(0,0,W,H);
+    for(const p of parts){
+      p.x+=p.vx+Math.sin(p.ph)*.12; p.y+=p.vy; p.ph+=p.tw;
+      if(p.y<-10){ Object.assign(p,mk(false)); }
+      const a=.25+.55*(.5+.5*Math.sin(p.ph*2));
+      cx.beginPath(); cx.arc(p.x,p.y,p.r,0,6.283);
+      cx.fillStyle=p.star?`rgba(255,246,220,${a*.8})`:`rgba(${color},${a})`; cx.fill();
+    }
+    requestAnimationFrame(frame);
   }
+  addEventListener('resize', resize, {passive:true}); resize(); requestAnimationFrame(frame);
+  return { setColor(c){ color=c; } };
 })();
 
-// ── STATE ──
-let state = { screen:'intro', currentQ:0, selected:null, answers:[], scores:{gryffindor:0,hufflepuff:0,ravenclaw:0,slytherin:0}, result:null };
-function t(){ return TEXT[LANG.current]; }
-function getResult(){ return Object.entries(state.scores).sort((a,b)=>b[1]-a[1])[0][0]; }
-function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+/* ───────────── AUDIO ───────────── */
+const audio = (() => {
+  const el = new Audio(MUSIC_SRC); el.loop=true; el.preload='auto'; el.volume=0;
+  const btn=$('#sound-btn'); const TARGET=.55; let fadeId=null;
+  let wanted = saved?.sound !== false;  // user preference
+  function fade(to, ms, done){
+    cancelAnimationFrame(fadeId); const from=el.volume, t0=performance.now();
+    const step=now=>{ const k=Math.min(1,(now-t0)/ms); try{ el.volume=from+(to-from)*k; }catch(e){} if(k<1) fadeId=requestAnimationFrame(step); else done&&done(); };
+    fadeId=requestAnimationFrame(step);
+  }
+  function ui(on){ btn.classList.toggle('on',on); btn.setAttribute('aria-pressed',on); }
+  function play(){ const p=el.play(); if(p&&p.then) p.then(()=>{ ui(true); fade(TARGET,2200); }).catch(()=>ui(false)); else { ui(true); fade(TARGET,2200); } }
+  function pause(){ ui(false); fade(0,500,()=>el.pause()); }
+  btn.addEventListener('click', ()=>{ haptic(12); wanted = el.paused || btn.classList.contains('on')===false; if(wanted) play(); else pause(); persist(); });
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ if(!el.paused) el.pause(); } else if(wanted && btn.classList.contains('on')) el.play().catch(()=>{}); });
+  return { start(){ if(wanted && el.paused) play(); }, get wanted(){ return wanted; } };
+})();
 
-// ── RENDER ──
-const app = document.getElementById('app');
-function render(){ switch(state.screen){ case'intro':renderIntro();break; case'quiz':renderQuiz();break; case'sorting':renderSorting();break; case'result':renderResult();break; } }
+function persist(extra){
+  const s = { ...(store.get()||{}), lang, name: state.name, sound: audio.wanted, ...extra };
+  if (state.result) Object.assign(s, { result: state.result, answers: state.answers });
+  else { delete s.result; delete s.answers; }
+  store.set(s);
+}
+
+/* ───────────── LANGUAGE ───────────── */
+const langBtn=$('#lang-btn');
+function applyLang(){ document.documentElement.lang=lang; document.body.classList.toggle('lang-th',lang==='th'); langBtn.textContent = lang==='th' ? 'EN' : 'ไทย'; }
+langBtn.addEventListener('click',()=>{ haptic(10); const inp=$('#name'); if(inp) state.name=inp.value.trim(); lang = lang==='th'?'en':'th'; applyLang(); persist(); render(false); });
+
+/* ───────────── SVG ───────────── */
+function academyCrest(){
+  return `<svg class="crest" viewBox="0 0 100 116" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2c0"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#7a5b14"/></linearGradient></defs>
+  <path d="M50 4 92 18v38c0 28-20 46-42 56C28 102 8 84 8 56V18Z" fill="#0d0b14" stroke="url(#cg)" stroke-width="2.5"/>
+  <path d="M50 12 84 23v33c0 22-16 38-34 46-18-8-34-24-34-46V23Z" fill="none" stroke="url(#cg)" stroke-width=".8" opacity=".6"/>
+  <path d="M50 12v90M16 56h68" stroke="url(#cg)" stroke-width=".8" opacity=".5"/>
+  <text x="33" y="42" font-size="15" text-anchor="middle">🦁</text><text x="67" y="42" font-size="15" text-anchor="middle">🦅</text>
+  <text x="33" y="80" font-size="15" text-anchor="middle">🐍</text><text x="67" y="80" font-size="15" text-anchor="middle">🦡</text>
+  <circle cx="50" cy="56" r="11" fill="#0d0b14" stroke="url(#cg)" stroke-width="1.5"/><text x="50" y="61" font-family="Cinzel,serif" font-weight="700" font-size="13" fill="url(#cg)" text-anchor="middle">R</text></svg>`;
+}
+function houseCrest(h){
+  const m=HOUSE_META[h];
+  return `<svg class="hcrest" viewBox="0 0 100 116" aria-hidden="true"><defs>
+    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${m.c1}"/><stop offset="1" stop-color="#05040a"/></linearGradient>
+    <linearGradient id="hb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2c0"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#7a5b14"/></linearGradient></defs>
+    <path d="M50 4 92 18v38c0 28-20 46-42 56C28 102 8 84 8 56V18Z" fill="url(#hg)" stroke="url(#hb)" stroke-width="3"/>
+    <path d="M50 4v108" stroke="${m.c2}" stroke-width="6" opacity=".35"/>
+    <text x="50" y="66" font-size="40" text-anchor="middle">${m.emoji}</text></svg>`;
+}
+
+/* ───────────── DERIVED MAGIC ───────────── */
+function tally(answers){ const s={valor:0,loyal:0,wisdom:0,ambit:0}; answers.forEach(a=>s[a]++); return s; }
+function sortHouse(answers){
+  const s=tally(answers); const max=Math.max(...Object.values(s));
+  const tied=HOUSES.filter(h=>s[h]===max);
+  if(tied.length===1) return tied[0];
+  // tie-break: the tied house chosen most recently
+  for(let i=answers.length-1;i>=0;i--) if(tied.includes(answers[i])) return answers[i];
+  return tied[0];
+}
+function relics(){
+  const L = lang==='th'?1:0, h=state.result;
+  const r = rng(hash(state.answers.join('|')+'#'+state.name.toLowerCase()));
+  const wood=pick(WOODS,r), core=pick(CORES[h],r), flex=pick(FLEX,r);
+  const len=(9+Math.floor(r()*13)/2 + (r()<.5?.25:.75)).toFixed(2).replace(/0$/,'');
+  const pat=pick(PATRONI[h],r);
+  const idNo = String(hash(state.name+state.answers.join(''))%900000+100000);
+  return { wood:wood[L], core:core[L], flex:flex[L], len:`${len} ${T().inches}`, patName:pat[L], patEmoji:pat[2], idNo };
+}
+function daily(){
+  const L = lang==='th'?1:0;
+  const r = rng(hash(todayKey()+'*'+state.name.toLowerCase()+'*'+state.result));
+  const sp=pick(SPELLS,r), pr=pick(PROPHECIES,r), col=pick(COLOURS,r), num=1+Math.floor(r()*99);
+  const date=new Date().toLocaleDateString(lang==='th'?'th-TH':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  return { spell:sp[L], spellDesc:sp[2+L], prophecy:pr[L], colour:col[L], num, date };
+}
+
+/* ───────────── RENDER ───────────── */
+function setHouseTheme(h){
+  if(h){ document.body.dataset.house=h; const m=HOUSE_META[h]; const c=m.c1.match(/\w\w/g).map(x=>parseInt(x,16)).join(','); dust.setColor(c); }
+  else { delete document.body.dataset.house; dust.setColor('212,175,55'); }
+}
+function render(animateOut=true){
+  const draw = () => { stopBannerFx(); ({intro:renderIntro,quiz:renderQuiz,sorting:renderSorting,result:renderResult})[state.screen](); scrollTo({top:0,behavior:'instant'}); };
+  const cur=$('.screen', app);
+  if(animateOut && cur){ cur.classList.add('leave'); setTimeout(draw,320); } else draw();
+}
 
 function renderIntro(){
-  const tx=t();
-  app.innerHTML=`
-    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-      ${hogwartsCrestSVG()}
-      <div class="title-block">
-        <div class="title-en">${tx.title}</div>
-        <div class="title-sub">${tx.subtitle}</div>
-      </div>
-      <div class="card">
-        <p class="intro-desc">${tx.introDesc}</p>
-        <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond">⟡</div><div class="ornament-line"></div></div>
-        <div class="intro-houses">
-          <div class="house-mini g" onclick="highlightStart(this)"><span class="hmoji">🦁</span><span class="hname">GRYFFINDOR</span></div>
-          <div class="house-mini h" onclick="highlightStart(this)"><span class="hmoji">🦡</span><span class="hname">HUFFLEPUFF</span></div>
-          <div class="house-mini r" onclick="highlightStart(this)"><span class="hmoji">🦅</span><span class="hname">RAVENCLAW</span></div>
-          <div class="house-mini s" onclick="highlightStart(this)"><span class="hmoji">🐍</span><span class="hname">SLYTHERIN</span></div>
-        </div>
-        <button class="start-btn" id="start-btn" onclick="startQuiz()"><span>${tx.start}</span></button>
-        <div style="margin-top:20px;text-align:center;font-family:'Kanit','Cinzel',serif;font-size:11px;letter-spacing:2px;color:rgba(201,168,76,0.35);">✦ CREATED BY NUMCHAI NCS ✦</div>
-      </div>
-    </div>`;
+  const t=T(); setHouseTheme(null);
+  const hn=t.houses;
+  app.innerHTML=`<section class="screen">
+    ${academyCrest()}
+    <div class="eyebrow" style="margin-top:14px">${t.school}</div>
+    <h1 class="title">${t.title}</h1>
+    <p class="sub">${t.introDesc}</p>
+    <div class="card">
+      <div class="house-row">${HOUSES.map(h=>`<div class="hmini"><b>${HOUSE_META[h].emoji}</b><span>${esc(TEXT.en.houses[h].name.toUpperCase())}</span></div>`).join('')}</div>
+      <div class="orn">✦</div>
+      <label class="fl" for="name">${t.nameLabel}</label>
+      <input id="name" class="name-in" type="text" maxlength="24" autocomplete="nickname" enterkeyhint="go" placeholder="${t.namePh}" value="${esc(state.name)}">
+      <button class="btn" id="start">✦ ${t.start} ✦</button>
+    </div>
+    ${footer()}
+  </section>`;
+  const inp=$('#name'), go=()=>{
+    const v=inp.value.trim();
+    if(!v){ haptic([30,40,30]); inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake'); toast(t.nameErr); inp.focus(); return; }
+    haptic(25); state.name=v; state.q=0; state.answers=[]; state.selected=null; state.result=null;
+    audio.start(); persist(); state.screen='quiz'; inp.blur(); render();
+  };
+  $('#start').addEventListener('click',go);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
 }
 
 function renderQuiz(){
-  const tx=t(); const q=tx.questions[state.currentQ]; const pct=(state.currentQ/5)*100;
-  const dotsHTML=[0,1,2,3,4].map(i=>{ let c='progress-dot'; if(i<state.currentQ)c+=' done'; if(i===state.currentQ)c+=' active'; return `<div class="${c}"></div>`; }).join('');
-  const optsHTML=shuffle(q.opts).map((o,i)=>`<button class="option-btn" onclick="selectOption('${o.house}',this)"><div class="option-letter">${String.fromCharCode(65+i)}</div><span>${o.text}</span></button>`).join('');
-  app.innerHTML=`
-    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-      ${hogwartsCrestSVG(50)}
-      <div style="width:100%;margin-bottom:16px;">
-        <div class="progress-label">${tx.questionLabel(state.currentQ+1)}</div>
-        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
-        <div class="progress-dots">${dotsHTML}</div>
-      </div>
-      <div class="card">
-        <div class="question-num">${tx.questionLabel(state.currentQ+1)}</div>
-        <span class="question-icon">${q.icon}</span>
-        <p class="question-text">${q.text}</p>
-        <div class="options-grid">${optsHTML}</div>
-        <button class="next-btn disabled-state" id="next-btn" onclick="nextQuestion()">${tx.next}</button>
-      </div>
-    </div>`;
-}
-
-function renderSorting(){
-  const tx=t(); const total=Object.values(state.scores).reduce((a,b)=>a+b,0);
-  const bars=['gryffindor','hufflepuff','ravenclaw','slytherin'].map(h=>{
-    const pct=total>0?(state.scores[h]/total*100):25;
-    const labels={gryffindor:'Gryffindor',hufflepuff:'Hufflepuff',ravenclaw:'Ravenclaw',slytherin:'Slytherin'};
-    const cls={gryffindor:'sbg',hufflepuff:'sbh',ravenclaw:'sbr',slytherin:'sbs'};
-    return `<div class="score-bar-item"><div class="score-bar-label">${labels[h]}</div><div class="score-bar-bg"><div class="score-bar-fg ${cls[h]}" data-pct="${pct}"></div></div></div>`;
-  }).join('');
-  app.innerHTML=`
-    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-      <div class="card">
-        <div class="sorting-hat-screen">
-          <span class="hat-emoji">🎩</span>
-          <div class="title-en" style="font-size:20px;margin-bottom:8px;">${tx.sortingTitle}</div>
-          <div class="thinking-dots">${tx.sortingLabel}...</div>
-          <div class="score-bars">${bars}</div>
-        </div>
-      </div>
-    </div>`;
-  setTimeout(()=>{ document.querySelectorAll('.score-bar-fg').forEach(el=>el.style.width=el.dataset.pct+'%'); },200);
-  setTimeout(()=>{ state.result=getResult(); state.screen='result'; render(); },3000);
-}
-
-function renderResult(){
-  const tx=t(); const house=state.result; const houseData=tx.houses[house]; const traits=tx.traits[house]; const hc=HOUSE_COLORS[house];
-  const traitPills=traits.map((tr,i)=>`<div class="trait-pill" style="animation-delay:${i*0.1}s">${tr}</div>`).join('');
-  app.innerHTML=`
-    <div class="screen" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-      ${hogwartsCrestSVG(50)}
-      <div class="title-block"><div class="title-sub">${tx.revealLabel}</div></div>
-      <div class="card">
-        <div class="result-wrap">
-          <div class="house-banner ${house}" id="house-banner-main">
-            <canvas id="house-particle-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;border-radius:18px;"></canvas>
-            <div style="position:relative;z-index:2;">
-              <span class="house-crest-big">${hc.emoji}</span>
-              <span class="house-result-name">${houseData.name}</span>
-              <div class="house-motto">"${houseData.motto}"</div>
-            </div>
-          </div>
-          <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond">⟡</div><div class="ornament-line"></div></div>
-          <div class="traits-section">
-            <div class="traits-title">${tx.traitsLabel}</div>
-            <div class="traits-grid">${traitPills}</div>
-          </div>
-          <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond">⟡</div><div class="ornament-line"></div></div>
-          <p class="house-desc">${houseData.desc}</p>
-          <div class="result-actions">
-            <button class="share-btn" id="share-btn-main" onclick="inviteMuggles()">
-              <div class="share-spinner"></div>
-              <svg class="share-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-              </svg>
-              <span class="share-label">${LANG.current==='th'?'🧙 ชวนพวกมักเกิลมาเล่นสิ':'🧙 Invite Your Muggle Friends'}</span>
-            </button>
-            <button class="download-btn" id="download-btn-main" onclick="downloadCard('${house}')">
-              <div class="dl-spinner"></div>
-              <svg class="dl-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              ${LANG.current==='th'?'📸 แชร์การ์ดของคุณ':'📸 Share Your House Card'}
-            </button>
-            <button class="retry-btn" onclick="retake()">${tx.retakeLabel}</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  requestAnimationFrame(()=>startHouseParticles(house));
-}
-
-// ── PARTICLES PER HOUSE ──
-let particleAnimId=null;
-function startHouseParticles(house){
-  if(particleAnimId) cancelAnimationFrame(particleAnimId);
-  const banner=document.getElementById('house-banner-main');
-  const cv=document.getElementById('house-particle-canvas');
-  if(!cv||!banner) return;
-  cv.width=banner.offsetWidth; cv.height=banner.offsetHeight;
-  const cx=cv.getContext('2d');
-  let particles=[]; let shootingStars=[];
-
-  if(house==='gryffindor'){
-    function spawnFire(){ particles.push({x:Math.random()*cv.width,y:cv.height+5,vx:(Math.random()-0.5)*1.2,vy:-(Math.random()*2.5+1),size:Math.random()*6+2,life:1,decay:Math.random()*0.012+0.008,hue:Math.random()*30,type:Math.random()<0.3?'ember':'flame'}); }
-    for(let i=0;i<60;i++) particles.push({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-0.5)*1.2,vy:-(Math.random()*2.5+1),size:Math.random()*6+2,life:Math.random(),decay:Math.random()*0.012+0.008,hue:Math.random()*30,type:Math.random()<0.3?'ember':'flame'});
-    function drawFire(ts){
-      particleAnimId=requestAnimationFrame(drawFire); cx.clearRect(0,0,cv.width,cv.height);
-      if(Math.random()<0.6) spawnFire();
-      particles.forEach(p=>{ p.x+=p.vx+Math.sin(ts*0.002+p.y*0.05)*0.4; p.y+=p.vy; p.life-=p.decay; p.size*=0.997;
-        if(p.life<=0){ p.x=Math.random()*cv.width; p.y=cv.height+5; p.life=1; p.size=Math.random()*6+2; }
-        const a=Math.max(0,p.life);
-        if(p.type==='ember'){ cx.save(); cx.globalAlpha=a*0.9; cx.fillStyle=`hsl(${p.hue+20},100%,70%)`; cx.shadowColor=`hsl(${p.hue},100%,60%)`; cx.shadowBlur=8; cx.beginPath(); cx.arc(p.x,p.y,p.size*0.5,0,Math.PI*2); cx.fill(); cx.restore(); }
-        else{ cx.save(); cx.globalAlpha=a*0.55; const g=cx.createRadialGradient(p.x,p.y,0,p.x,p.y-p.size,p.size*1.5); g.addColorStop(0,`hsla(${p.hue+40},100%,80%,1)`); g.addColorStop(0.4,`hsla(${p.hue+10},100%,55%,0.8)`); g.addColorStop(1,`hsla(${p.hue},100%,30%,0)`); cx.fillStyle=g; cx.beginPath(); cx.ellipse(p.x,p.y,p.size*0.6,p.size*1.2,0,0,Math.PI*2); cx.fill(); cx.restore(); }
-      });
-    } drawFire(0);
-  }
-  else if(house==='hufflepuff'){
-    for(let i=0;i<50;i++) particles.push({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-0.5)*0.4,vy:-(Math.random()*0.6+0.2),r:Math.random()*8+3,life:Math.random(),decay:Math.random()*0.004+0.002,hue:Math.random()*40+30,wobble:Math.random()*Math.PI*2,wobbleSpeed:Math.random()*0.03+0.01,type:Math.random()<0.4?'petal':'bubble'});
-    function drawHuff(ts){
-      particleAnimId=requestAnimationFrame(drawHuff); cx.clearRect(0,0,cv.width,cv.height);
-      if(Math.random()<0.25) particles.push({x:Math.random()*cv.width,y:cv.height+10,vx:(Math.random()-0.5)*0.4,vy:-(Math.random()*0.6+0.2),r:Math.random()*8+3,life:1,decay:Math.random()*0.004+0.002,hue:Math.random()*40+30,wobble:Math.random()*Math.PI*2,wobbleSpeed:Math.random()*0.03+0.01,type:Math.random()<0.4?'petal':'bubble'});
-      particles.forEach(p=>{ p.wobble+=p.wobbleSpeed; p.x+=p.vx+Math.sin(p.wobble)*0.5; p.y+=p.vy; p.life-=p.decay;
-        if(p.life<=0){ p.x=Math.random()*cv.width; p.y=cv.height+10; p.life=1; }
-        const a=Math.max(0,p.life);
-        if(p.type==='bubble'){ cx.save(); cx.globalAlpha=a*0.6; const g=cx.createRadialGradient(p.x-p.r*0.3,p.y-p.r*0.3,0,p.x,p.y,p.r); g.addColorStop(0,`hsla(${p.hue+20},100%,95%,0.8)`); g.addColorStop(0.5,`hsla(${p.hue},90%,70%,0.4)`); g.addColorStop(1,`hsla(${p.hue},80%,50%,0)`); cx.fillStyle=g; cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2); cx.fill(); cx.strokeStyle=`hsla(${p.hue+10},100%,80%,${a*0.5})`; cx.lineWidth=0.5; cx.stroke(); cx.restore(); }
-        else{ cx.save(); cx.globalAlpha=a*0.7; cx.translate(p.x,p.y); cx.rotate(p.wobble); cx.fillStyle=`hsla(${p.hue},90%,75%,0.8)`; cx.shadowColor=`hsla(${p.hue},100%,80%,0.5)`; cx.shadowBlur=6; cx.beginPath(); cx.ellipse(0,-p.r*0.5,p.r*0.5,p.r,0.3,0,Math.PI*2); cx.fill(); cx.restore(); }
-      });
-    } drawHuff(0);
-  }
-  else if(house==='ravenclaw'){
-    for(let i=0;i<55;i++) particles.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*2.5+0.5,phase:Math.random()*Math.PI*2,speed:Math.random()*0.04+0.01,hue:Math.random()*60+190,life:1,twinkle:Math.random()<0.4});
-    function spawnShooter(){ shootingStars.push({x:Math.random()*cv.width*1.5-cv.width*0.25,y:Math.random()*cv.height*0.4,vx:Math.random()*6+3,vy:Math.random()*3+1.5,len:Math.random()*80+40,life:1,decay:Math.random()*0.025+0.015,hue:Math.random()*60+190}); }
-    function drawRaven(ts){
-      particleAnimId=requestAnimationFrame(drawRaven); cx.clearRect(0,0,cv.width,cv.height);
-      if(Math.random()<0.012) spawnShooter();
-      shootingStars=shootingStars.filter(s=>s.life>0);
-      shootingStars.forEach(s=>{ s.x+=s.vx; s.y+=s.vy; s.life-=s.decay; const a=Math.max(0,s.life); const g=cx.createLinearGradient(s.x,s.y,s.x-s.vx*s.len/6,s.y-s.vy*s.len/6); g.addColorStop(0,`hsla(${s.hue},100%,90%,${a})`); g.addColorStop(1,`hsla(${s.hue},100%,70%,0)`); cx.save(); cx.strokeStyle=g; cx.lineWidth=2; cx.globalAlpha=a; cx.shadowColor=`hsl(${s.hue},100%,80%)`; cx.shadowBlur=8; cx.beginPath(); cx.moveTo(s.x,s.y); cx.lineTo(s.x-s.vx*(s.len/6),s.y-s.vy*(s.len/6)); cx.stroke(); cx.fillStyle=`hsla(${s.hue},100%,95%,${a})`; cx.beginPath(); cx.arc(s.x,s.y,2,0,Math.PI*2); cx.fill(); cx.restore(); });
-      particles.forEach(p=>{ const blink=0.5+0.5*Math.sin(ts*p.speed+p.phase); const a=p.twinkle?blink*0.9:0.6; const r=p.twinkle?p.r*(0.7+0.5*blink):p.r; cx.save(); cx.globalAlpha=a; cx.shadowColor=`hsl(${p.hue},100%,80%)`; cx.shadowBlur=p.twinkle?12*blink:4; cx.fillStyle=`hsl(${p.hue},80%,85%)`; cx.translate(p.x,p.y); cx.beginPath(); for(let k=0;k<4;k++){ const ang=(k/4)*Math.PI*2; const ia=ang+Math.PI/4; const or=r*2.5; const ir=r*0.8; if(k===0) cx.moveTo(Math.cos(ang)*or,Math.sin(ang)*or); else cx.lineTo(Math.cos(ang)*or,Math.sin(ang)*or); cx.lineTo(Math.cos(ia)*ir,Math.sin(ia)*ir); } cx.closePath(); cx.fill(); cx.restore(); });
-    } drawRaven(0);
-  }
-  else if(house==='slytherin'){
-    for(let i=0;i<45;i++) particles.push({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.3,r:Math.random()*18+6,life:Math.random(),decay:Math.random()*0.005+0.002,phase:Math.random()*Math.PI*2,speed:Math.random()*0.02+0.005,hue:Math.random()*30+100,sat:Math.random()*40+50,bright:Math.random()*20+30});
-    const wisps=Array.from({length:3},(_,wi)=>({nodes:Array.from({length:12},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height})),angle:Math.random()*Math.PI*2,speed:Math.random()*0.008+0.004,hue:120+Math.random()*20}));
-    function drawSlytherin(ts){
-      particleAnimId=requestAnimationFrame(drawSlytherin); cx.clearRect(0,0,cv.width,cv.height);
-      particles.forEach(p=>{ p.phase+=p.speed; p.x+=p.vx+Math.cos(p.phase)*0.4; p.y+=p.vy+Math.sin(p.phase*0.7)*0.3; p.life-=p.decay; if(p.x<-p.r) p.x=cv.width+p.r; if(p.x>cv.width+p.r) p.x=-p.r; if(p.life<=0){ p.life=1; p.y=Math.random()*cv.height; } const a=Math.max(0,Math.min(1,p.life))*0.35; cx.save(); cx.globalAlpha=a; const g=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r); g.addColorStop(0,`hsla(${p.hue},${p.sat+20}%,${p.bright+30}%,0.8)`); g.addColorStop(0.5,`hsla(${p.hue},${p.sat}%,${p.bright}%,0.4)`); g.addColorStop(1,`hsla(${p.hue},${p.sat-10}%,${p.bright}%,0)`); cx.fillStyle=g; cx.shadowColor=`hsl(${p.hue},80%,40%)`; cx.shadowBlur=12; cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2); cx.fill(); cx.restore(); });
-      wisps.forEach((w,wi)=>{ w.angle+=w.speed+Math.sin(ts*0.001+wi)*0.005; const head=w.nodes[0]; head.x+=Math.cos(w.angle+Math.sin(ts*0.0015+wi*2)*0.8)*1.5; head.y+=Math.sin(w.angle+Math.cos(ts*0.001+wi*1.5)*0.6)*1.2; if(head.x<0) head.x=cv.width; if(head.x>cv.width) head.x=0; if(head.y<0) head.y=cv.height; if(head.y>cv.height) head.y=0; for(let ni=w.nodes.length-1;ni>0;ni--){ const curr=w.nodes[ni],prev=w.nodes[ni-1]; curr.x+=(prev.x-curr.x)*0.18; curr.y+=(prev.y-curr.y)*0.18; } cx.save(); cx.lineWidth=2; cx.lineCap='round'; cx.lineJoin='round'; cx.shadowColor=`hsl(${w.hue},100%,55%)`; cx.shadowBlur=14; w.nodes.forEach((node,ni)=>{ const frac=1-ni/w.nodes.length; cx.globalAlpha=frac*0.65; cx.strokeStyle=`hsla(${w.hue+ni*3},100%,${55+ni*2}%,${frac})`; cx.beginPath(); if(ni>0){ cx.moveTo(w.nodes[ni-1].x,w.nodes[ni-1].y); cx.lineTo(node.x,node.y); cx.stroke(); } if(ni===0){ cx.globalAlpha=0.9; cx.fillStyle=`hsl(${w.hue},100%,80%)`; cx.shadowBlur=18; cx.beginPath(); cx.arc(node.x,node.y,3,0,Math.PI*2); cx.fill(); } }); cx.restore(); });
-    } drawSlytherin(0);
-  }
-}
-
-// ── SVG CREST ──
-function hogwartsCrestSVG(size=90){
-  return `<svg class="crest-svg" style="width:${size}px;height:${size}px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <defs><radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#F0D080"/><stop offset="100%" stop-color="#8B6914"/></radialGradient></defs>
-    <path d="M50 8 L88 22 L88 55 Q88 80 50 95 Q12 80 12 55 L12 22 Z" fill="rgba(10,8,18,0.8)" stroke="url(#cg)" stroke-width="2"/>
-    <path d="M50 8 L88 22 L88 55 Q88 67 50 51.5 Z" fill="rgba(116,0,1,0.6)"/>
-    <path d="M12 22 L50 8 L50 51.5 Q12 67 12 55 Z" fill="rgba(14,26,64,0.6)"/>
-    <path d="M50 51.5 Q88 67 88 55 L88 55 Q88 80 50 95 Z" fill="rgba(236,185,57,0.4)"/>
-    <path d="M12 55 Q12 80 50 95 L50 51.5 Q12 67 12 55 Z" fill="rgba(26,71,42,0.6)"/>
-    <line x1="50" y1="8" x2="50" y2="95" stroke="url(#cg)" stroke-width="1" opacity="0.6"/>
-    <line x1="12" y1="51.5" x2="88" y2="51.5" stroke="url(#cg)" stroke-width="1" opacity="0.6"/>
-    <text x="72" y="36" font-size="14" text-anchor="middle" dominant-baseline="middle">🦁</text>
-    <text x="28" y="36" font-size="14" text-anchor="middle" dominant-baseline="middle">🦅</text>
-    <text x="72" y="66" font-size="14" text-anchor="middle" dominant-baseline="middle">🦡</text>
-    <text x="28" y="66" font-size="14" text-anchor="middle" dominant-baseline="middle">🐍</text>
-    <text x="50" y="52" font-size="18" font-family="serif" font-weight="bold" fill="url(#cg)" text-anchor="middle" dominant-baseline="middle">H</text>
-    <text x="50" y="14" font-size="8" fill="#C9A84C" text-anchor="middle">✦</text>
-  </svg>`;
-}
-
-// ── ACTIONS ──
-function startQuiz(){ state={screen:'quiz',currentQ:0,selected:null,answers:[],scores:{gryffindor:0,hufflepuff:0,ravenclaw:0,slytherin:0},result:null}; render(); }
-
-function selectOption(house,el){
-  document.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
-  el.classList.add('selected'); state.selected=house;
-  const btn=document.getElementById('next-btn');
-  if(btn){
-    btn.classList.remove('disabled-state');
-    btn.classList.add('visible');
-  }
-}
-
-function highlightStart(el){
-  // Deselect all house cards then highlight clicked
-  document.querySelectorAll('.house-mini').forEach(c=>c.classList.remove('selected-house'));
-  el.classList.add('selected-house');
-  // Neon glow the start button
-  const btn=document.getElementById('start-btn');
-  if(btn) btn.classList.add('neon');
-}
-
-function nextQuestion(){
-  if(!state.selected) return;
-  state.scores[state.selected]++; state.answers.push(state.selected); state.selected=null;
-  if(state.currentQ<4){ state.currentQ++; const card=document.querySelector('.card'); if(card){ card.classList.add('slide-out-left'); setTimeout(()=>render(),350); } else render(); }
-  else{ state.screen='sorting'; render(); }
-}
-
-// ── TOAST ──
-let toastTimer=null;
-function showToast(icon,msg){
-  const el=document.getElementById('toast'); if(!el) return;
-  el.innerHTML=`<span>${icon}</span><span>${msg}</span>`; el.classList.remove('hide'); el.classList.add('show');
-  if(toastTimer) clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>{ el.classList.remove('show'); el.classList.add('hide'); },3000);
-}
-
-// ── GENERATE RICH CARD ──
-function generateRichCard(house){
-  return new Promise(resolve=>{
-    const W=1080,H=1920; const c=document.createElement('canvas'); c.width=W; c.height=H; const ctx=c.getContext('2d');
-    const cfg={
-      gryffindor:{bg1:'#1A0000',bg2:'#5A0001',bg3:'#3D0000',accent:'#D3A625',glow:'rgba(211,166,37,0.55)',emoji:'🦁',pillBg:'rgba(116,0,1,0.6)'},
-      hufflepuff: {bg1:'#1C1000',bg2:'#4A2E00',bg3:'#6B4300',accent:'#ECB939',glow:'rgba(236,185,57,0.55)',emoji:'🦡',pillBg:'rgba(90,65,0,0.6)'},
-      ravenclaw:  {bg1:'#020510',bg2:'#0A1230',bg3:'#0E1A40',accent:'#A07840',glow:'rgba(148,107,45,0.5)', emoji:'🦅',pillBg:'rgba(14,26,64,0.7)'},
-      slytherin:  {bg1:'#030A06',bg2:'#0F2B18',bg3:'#1A472A',accent:'#B8B8B8',glow:'rgba(150,200,150,0.35)',emoji:'🐍',pillBg:'rgba(26,71,42,0.7)'}
-    };
-    const hc=cfg[house]; const lang=LANG.current; const tx=TEXT[lang]; const houseData=tx.houses[house]; const traits=tx.traits[house];
-    const bgGrad=ctx.createLinearGradient(0,0,0,H); bgGrad.addColorStop(0,hc.bg1); bgGrad.addColorStop(0.4,hc.bg2); bgGrad.addColorStop(1,hc.bg3); ctx.fillStyle=bgGrad; ctx.fillRect(0,0,W,H);
-    const glow=ctx.createRadialGradient(W/2,H*0.38,0,W/2,H*0.38,W*0.75); glow.addColorStop(0,hc.glow); glow.addColorStop(1,'transparent'); ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
-    ctx.save(); for(let i=0;i<260;i++){ ctx.globalAlpha=Math.random()*0.65+0.1; ctx.fillStyle='#F5E8C8'; ctx.beginPath(); ctx.arc(Math.random()*W,Math.random()*H,Math.random()*2+0.3,0,Math.PI*2); ctx.fill(); } ctx.restore();
-    ctx.save(); ctx.strokeStyle=hc.accent; ctx.lineWidth=5; ctx.globalAlpha=0.45; ctx.strokeRect(44,44,W-88,H-88); ctx.lineWidth=1.5; ctx.globalAlpha=0.2; ctx.strokeRect(60,60,W-120,H-120); ctx.restore();
-    ctx.save(); ctx.fillStyle=hc.accent; ctx.font='52px serif'; ctx.globalAlpha=0.55; ctx.textAlign='center'; ctx.textBaseline='middle'; [[80,80],[W-80,80],[80,H-80],[W-80,H-80]].forEach(([x,y])=>ctx.fillText('✦',x,y)); ctx.restore();
-    function dt(text,x,y,font,color,alpha=1,sBlur=0,sColor=''){ ctx.save(); ctx.font=font; ctx.fillStyle=color; ctx.globalAlpha=alpha; ctx.textAlign='center'; ctx.textBaseline='middle'; if(sBlur){ctx.shadowColor=sColor||color;ctx.shadowBlur=sBlur;} ctx.fillText(text,x,y); ctx.restore(); }
-    function wrapText(text,maxW,font){ ctx.save(); ctx.font=font; const words=text.split(' '); const lines=[]; let line=''; for(const w of words){ const test=line?line+' '+w:w; if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w;}else line=test; } if(line) lines.push(line); ctx.restore(); return lines; }
-    dt('HOGWARTS SORTING',W/2,185,'bold 40px Arial Narrow,Arial,sans-serif',hc.accent,0.5);
-    ctx.save(); ctx.strokeStyle=hc.accent; ctx.globalAlpha=0.25; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(130,225); ctx.lineTo(W-130,225); ctx.stroke(); ctx.restore();
-    dt('✦  THE SORTING HAT DECLARES  ✦',W/2,270,'36px Arial,sans-serif',hc.accent,0.55);
-    dt(hc.emoji,W/2,560,'290px serif','#fff',1,60,hc.accent);
-    const houseNames={en:{gryffindor:'GRYFFINDOR',hufflepuff:'HUFFLEPUFF',ravenclaw:'RAVENCLAW',slytherin:'SLYTHERIN'},th:{gryffindor:'กริฟฟินดอร์',hufflepuff:'ฮัฟเฟิลพัฟฟ์',ravenclaw:'เรเวนคลอว์',slytherin:'สลิธีรีน'}};
-    const nfs=lang==='th'?100:92; dt(houseNames[lang][house],W/2,800,`bold ${nfs}px ${lang==='th'?'Arial':'Arial Narrow'},Arial,sans-serif`,hc.accent,1,36,hc.accent);
-    dt(`"${houseData.motto}"`,W/2,910,`italic 46px ${lang==='th'?'Arial':'Georgia'},serif`,'rgba(245,232,200,0.72)',1);
-    ctx.save(); ctx.strokeStyle=hc.accent; ctx.globalAlpha=0.25; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(150,975); ctx.lineTo(W-150,975); ctx.stroke(); dt('⟡',W/2,975,'42px serif',hc.accent,0.55); ctx.restore();
-    const PH=64,PR=32,PG=18; const pf=`500 34px ${lang==='th'?'Arial':'Arial Narrow'},Arial,sans-serif`;
-    ctx.save(); ctx.font=pf; const pws=traits.map(tr=>ctx.measureText(tr).width+56); const tpw=pws.reduce((a,b)=>a+b,0)+PG*(traits.length-1); let px=(W-tpw)/2; const py=1030;
-    traits.forEach((tr,i)=>{ const pw=pws[i]; ctx.save(); ctx.fillStyle=hc.pillBg; ctx.globalAlpha=0.85; ctx.beginPath(); ctx.roundRect(px,py-PH/2,pw,PH,PR); ctx.fill(); ctx.strokeStyle=hc.accent; ctx.lineWidth=1.5; ctx.globalAlpha=0.5; ctx.stroke(); ctx.restore(); ctx.save(); ctx.font=pf; ctx.fillStyle=hc.accent; ctx.globalAlpha=0.95; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(tr,px+pw/2,py); ctx.restore(); px+=pw+PG; }); ctx.restore();
-    ctx.save(); ctx.strokeStyle=hc.accent; ctx.globalAlpha=0.18; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(130,1100); ctx.lineTo(W-130,1100); ctx.stroke(); ctx.restore();
-    const df=`${lang==='th'?'400':'normal'} 40px ${lang==='th'?'Arial':'Georgia'},serif`; const dls=wrapText(houseData.desc,W-200,df); ctx.save(); ctx.font=df; ctx.fillStyle='rgba(245,232,200,0.8)'; ctx.textAlign='center'; ctx.textBaseline='top'; ctx.globalAlpha=1; const dlh=lang==='th'?62:56; dls.forEach((line,i)=>ctx.fillText(line,W/2,1125+i*dlh)); ctx.restore();
-    const divY=H-260; ctx.save(); ctx.strokeStyle=hc.accent; ctx.globalAlpha=0.25; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(130,divY); ctx.lineTo(W-130,divY); ctx.stroke(); dt('✦',W/2,divY,'36px serif',hc.accent,0.45); ctx.restore();
-    dt('🎩 hogwarts-quiz-ivory.vercel.app',W/2,H-195,'40px Arial,sans-serif',hc.accent,0.55);
-    dt('#HogwartsQuiz  #WizardingWorld  #SortingHat',W/2,H-130,'32px Arial,sans-serif','rgba(245,232,200,0.35)',1);
-    dt('Created by Numchai Ncs',W/2,H-68,'28px Arial,sans-serif',hc.accent,0.38);
-    resolve(c);
+  const t=T(), q=t.questions[state.q], last=state.q===4;
+  const candles=[0,1,2,3,4].map(i=>`<div class="candle ${i<state.q?'lit':''} ${i===state.q?'cur':''}"><div class="flame"></div></div>`).join('');
+  const opts=shuffle(q.opts).map((o,i)=>`<button class="opt" data-h="${o.house}" style="animation-delay:${.08*i+.1}s"><span class="ltr">${'ABCD'[i]}</span><span>${o.text}</span></button>`).join('');
+  app.innerHTML=`<section class="screen">
+    <div class="candles" aria-hidden="true">${candles}</div>
+    <div class="eyebrow qcount">${t.q(state.q+1)}</div>
+    <div class="card">
+      <span class="qicon">${q.icon}</span>
+      <p class="qtext">${q.text}</p>
+      <div class="opts">${opts}</div>
+      <button class="btn" id="next" disabled>${last?'✦ '+t.reveal+' ✦':t.next+' ⟶'}</button>
+    </div>
+  </section>`;
+  const next=$('#next');
+  app.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+    haptic(15); app.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+    state.selected=b.dataset.h; next.disabled=false;
+  }));
+  next.addEventListener('click',()=>{
+    if(!state.selected) return; haptic(20);
+    state.answers[state.q]=state.selected; state.selected=null;
+    if(state.q<4){ state.q++; } else { state.screen='sorting'; }
+    render();
   });
 }
 
-// ── INVITE MUGGLES ──
-async function inviteMuggles(){
-  const QUIZ_URL='https://hogwarts-quiz-ivory.vercel.app/';
-  const shareText=LANG.current==='th'?'🎩 มาลองดูกันสิว่าคุณจะได้อยู่บ้านไหนในฮอกวอตส์!':'🎩 Find out which Hogwarts house you belong to!';
-  if(navigator.share){ try{ await navigator.share({title:'Hogwarts Sorting Quiz',text:shareText,url:QUIZ_URL}); return; }catch(e){ if(e.name==='AbortError') return; } }
-  try{ await navigator.clipboard.writeText(QUIZ_URL); showToast('🧙',LANG.current==='th'?'คัดลอกลิ้งค์แล้ว! ส่งให้มักเกิลได้เลย':'Link copied! Send it to your muggle friends'); }catch{ window.prompt('Copy this link:',QUIZ_URL); }
+function renderSorting(){
+  const t=T(); const runes='ᚠᚢᚦᚨᚱᚲᚷᚹ'.split('');
+  app.innerHTML=`<section class="screen" style="justify-content:center">
+    <div class="ritual">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+      ${runes.map((r,i)=>`<span class="rune" style="transform:translate(-50%,-50%) rotate(${i*45}deg) translateY(-104px)">${r}</span>`).join('')}
+      <div class="orb" id="orb">✦</div>
+    </div>
+    <div class="ritual-word" id="rw">${t.sortWords[0]}</div>
+  </section>`;
+  state.result = sortHouse(state.answers);
+  const words=t.sortWords, rw=$('#rw'), orb=$('#orb'); let i=0;
+  const emojis=HOUSES.map(h=>HOUSE_META[h].emoji);
+  haptic([20,80,20]);
+  const iv=setInterval(()=>{ i++; if(i<words.length) rw.textContent=words[i]; orb.textContent=emojis[i%4]; haptic(10); },560);
+  setTimeout(()=>{
+    clearInterval(iv); orb.textContent=HOUSE_META[state.result].emoji;
+    setHouseTheme(state.result);
+    const f=$('#flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    haptic([60,40,120]); persist(); state.screen='result'; render();
+  },2500);
 }
 
-// ── DOWNLOAD CARD ──
-async function downloadCard(house){
-  const btn=document.getElementById('download-btn-main');
-  if(btn){ btn.classList.add('loading'); const sp=btn.querySelector('span'); if(sp) sp.textContent=LANG.current==='th'?'กำลังสร้างการ์ด...':'Creating card...'; }
-  function resetBtn(){ if(!btn) return; btn.classList.remove('loading'); const sp=btn.querySelector('span'); if(sp) sp.textContent=LANG.current==='th'?'📸 แชร์การ์ดของคุณ':'📸 Save Your House Card'; }
+function renderResult(){
+  const t=T(), h=state.result, hd=t.houses[h], rl=relics(), d=daily();
+  setHouseTheme(h);
+  app.innerHTML=`<section class="screen">
+    <div class="eyebrow">✦ ${t.declares} ✦</div>
+    <div class="streak">🔥 ${t.streak(visit.streak||1)}</div>
+    <div class="banner" style="margin-top:14px">
+      <canvas id="bfx"></canvas>
+      ${houseCrest(h)}
+      <div class="hname">${esc(hd.name.toUpperCase())}</div>
+      <div class="hmotto">“${hd.motto}”</div>
+      <div class="traits">${t.traits[h].map((x,i)=>`<span class="trait" style="animation-delay:${.6+i*.08}s">${x}</span>`).join('')}</div>
+    </div>
+
+    <article class="scroll">
+      <div class="s-eye">${t.acceptEye.toUpperCase()}</div>
+      <div class="s-name">${t.dear} ${esc(state.name)}</div>
+      <div class="orn" style="color:#8a6a2c;margin:12px 0">❦</div>
+      <p>${t.accept(esc(hd.name))}</p>
+      <div class="sig"><small>${t.headmaster}<br>${d.date}</small><div class="seal">${HOUSE_META[h].emoji}</div></div>
+    </article>
+
+    <div class="sec-title" style="margin-top:30px">${t.relics}</div>
+    <div class="grid2" style="margin-top:0">
+      <div class="relic"><span class="ico">🪄</span><h4>${t.wand.toUpperCase()}</h4>
+        <div class="big">${rl.wood}</div>
+        <dl><dt>${t.core}: </dt><dd>${rl.core}</dd><dt>${t.length}: </dt><dd>${rl.len}</dd><dt>${t.flex}: </dt><dd>${rl.flex}</dd></dl></div>
+      <div class="relic pat ${state.summoned?'':'veiled'}" id="pat"><span class="ico pico" style="font-size:44px">${rl.patEmoji}</span><h4>${t.patronus.toUpperCase()}</h4>
+        <div class="big">${rl.patName}</div><dl><dd>${t.spirit}</dd></dl>
+        <div class="mist"><div><span style="font-size:30px">✨</span><br>${t.summon}<br>${t.patronus}</div></div></div>
+    </div>
+
+    <div class="prophecy ${(store.get()||{}).castDay===todayKey()?'cast':''}" id="proph">
+      <div class="sec-title" style="margin-bottom:6px">🔮 ${t.today}</div>
+      <div class="date">${d.date}</div>
+      <button class="cast-btn" id="cast" aria-label="${t.holdCast}"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" class="trk"/><circle cx="50" cy="50" r="44" class="prg" id="prg"/></svg><span>🪄</span></button>
+      <div class="spell-desc cast-hint">${t.holdCast}</div>
+      <div class="ph-body">
+      <div class="spell">${d.spell}</div>
+      <div class="spell-desc">${d.spellDesc}</div>
+      <blockquote>“${d.prophecy}”</blockquote>
+      <div class="lucky"><span>${t.luckyNum} <b>${d.num}</b></span><span>${t.luckyCol} <b>${d.colour}</b></span></div>
+      <div class="spell-desc" style="margin-top:12px;font-size:12px">${t.returnNote}</div>
+      </div>
+    </div>
+
+    <div class="card game-card" style="margin-top:16px;text-align:center">
+      <div class="sec-title">✨ ${t.game}</div>
+      <p class="desc">${t.gameDesc}</p>
+      <div class="lucky"><span>${t.best} <b id="bestv">${(store.get()||{}).best||0}</b> ${t.points}</span></div>
+      <button class="btn house" id="game">${t.play}</button>
+      <button class="btn ghost" id="board" style="margin-top:10px">${t.boardBtn}</button>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="sec-title">${t.about}</div>
+      <p class="desc">${hd.desc}</p>
+    </div>
+
+    <button class="btn house" id="save"><span class="spin"></span>📸 ${t.save}</button>
+    <button class="btn ghost" id="share">✉ ${t.share}</button>
+    <button class="btn ghost" id="retake" style="margin-top:10px">↺ ${t.retake}</button>
+    ${footer()}
+  </section>`;
+  $('#save').addEventListener('click',saveCard);
+  $('#share').addEventListener('click',shareLink);
+  $('#retake').addEventListener('click',()=>{ haptic(15); state.result=null; state.answers=[]; state.summoned=false; persist(); state.screen='intro'; render(); });
+  $('#game').addEventListener('click',openGame);
+  $('#board').addEventListener('click',()=>openBoard());
+  const pat=$('#pat');
+  pat.addEventListener('click',()=>{
+    if(!pat.classList.contains('veiled')) return;
+    pat.classList.remove('veiled'); state.summoned=true;
+    const b=pat.getBoundingClientRect(); burst(b.left+b.width/2,b.top+b.height/2,30); haptic([20,30,70]);
+  });
+  setupCast();
+  requestAnimationFrame(()=>startBannerFx(h));
+}
+
+function footer(){
+  return `<footer class="footer"><a href="${RICHER_URL}" target="_blank" rel="noopener"><span class="brand">✦ See More Special Project ✦</span><span class="tag">${T().footer}</span></a></footer>`;
+}
+
+/* ───────────── SPARKLE BURST ───────────── */
+function burst(x,y,n=24){
+  for(let i=0;i<n;i++){
+    const s=document.createElement('i'); s.className='spark';
+    const a=Math.random()*6.283, d=50+Math.random()*100;
+    s.style.left=x+'px'; s.style.top=y+'px';
+    s.style.setProperty('--dx',Math.cos(a)*d+'px'); s.style.setProperty('--dy',Math.sin(a)*d+'px');
+    document.body.appendChild(s); setTimeout(()=>s.remove(),950);
+  }
+}
+
+/* ───────────── HOLD-TO-CAST PROPHECY ───────────── */
+function setupCast(){
+  const btn=$('#cast'), prg=$('#prg'), box=$('#proph'); if(!btn) return;
+  const LEN=276.5, HOLD=1400; let t0=0, raf=0, lastBuzz=0;
+  const reset=()=>{ cancelAnimationFrame(raf); raf=0; btn.classList.remove('charging'); prg.style.strokeDashoffset=LEN; };
+  const done=()=>{
+    raf=0; btn.classList.remove('charging');
+    const b=btn.getBoundingClientRect(); burst(b.left+b.width/2,b.top+b.height/2,40);
+    const f=$('#flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    haptic([40,40,100]); box.classList.add('cast'); persist({castDay:todayKey()});
+  };
+  const tick=now=>{
+    const k=Math.min(1,(now-t0)/HOLD); prg.style.strokeDashoffset=LEN*(1-k);
+    if(now-lastBuzz>170){ haptic(6+Math.round(k*24)); lastBuzz=now; }
+    if(k<1) raf=requestAnimationFrame(tick); else done();
+  };
+  btn.addEventListener('pointerdown',e=>{ e.preventDefault(); try{btn.setPointerCapture(e.pointerId);}catch(_){} t0=performance.now(); lastBuzz=0; btn.classList.add('charging'); raf=requestAnimationFrame(tick); });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,()=>{ if(raf) reset(); }));
+  btn.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); done(); } });
+  btn.addEventListener('contextmenu',e=>e.preventDefault());
+}
+
+/* ───────────── SOUND EFFECTS (synthesised, no files) ───────────── */
+let AC=null;
+function sfx(kind){
+  if(!audio.wanted) return;
   try{
-    const cv=await generateRichCard(house); const blob=await new Promise(res=>cv.toBlob(res,'image/png')); const file=new File([blob],`hogwarts-${house}-card.png`,{type:'image/png'});
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){ resetBtn(); try{ await navigator.share({files:[file],title:'Hogwarts Sorting Quiz',text:LANG.current==='th'?`ฉันได้บ้าน ${TEXT[LANG.current].houses[house].name} ในฮอกวอตส์! 🎩`:`I got sorted into ${TEXT.en.houses[house].name} at Hogwarts! 🎩`}); return; }catch(e){ if(e.name==='AbortError'){resetBtn();return;} } }
-    resetBtn(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`hogwarts-${house}-card.png`; a.click(); URL.revokeObjectURL(a.href);
-    showToast('📸',LANG.current==='th'?'บันทึกการ์ดลงเครื่องแล้ว!':'Card saved to your device!');
-  }catch(err){ resetBtn(); showToast('⚠️',LANG.current==='th'?'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง':'Something went wrong, please try again'); }
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume();
+    const now=AC.currentTime;
+    const tone=(f,t,d,type='sine',v=.16,f2)=>{
+      const o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.setValueAtTime(f,now+t);
+      if(f2) o.frequency.exponentialRampToValueAtTime(f2,now+t+d);
+      g.gain.setValueAtTime(.0001,now+t); g.gain.exponentialRampToValueAtTime(v,now+t+.012); g.gain.exponentialRampToValueAtTime(.0001,now+t+d);
+      o.connect(g); g.connect(AC.destination); o.start(now+t); o.stop(now+t+d+.03);
+    };
+    if(kind==='star'){ tone(880,0,.2); tone(1320,.06,.24,'triangle',.1); }
+    else if(kind==='comet'){ [784,988,1175,1568].forEach((f,i)=>tone(f,i*.07,.25,'triangle',.14)); }
+    else if(kind==='bad'){ tone(190,0,.38,'sawtooth',.16,60); tone(130,0,.38,'square',.08,45); }
+    else if(kind==='end'){ [523,659,784,1047].forEach((f,i)=>tone(f,i*.12,.5,'triangle',.14)); }
+    else if(kind==='record'){ [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,i*.1,.6,'triangle',.15)); }
+    else if(kind==='tick'){ tone(1400,0,.04,'square',.04); }
+  }catch(e){}
 }
 
-// ── RETAKE ──
-function retake(){
-  if(particleAnimId){cancelAnimationFrame(particleAnimId);particleAnimId=null;}
-  state={screen:'intro',currentQ:0,selected:null,answers:[],scores:{gryffindor:0,hufflepuff:0,ravenclaw:0,slytherin:0},result:null};
-  render();
+/* ───────────── ONLINE LEADERBOARD (Supabase) ───────────── */
+const SB_URL='https://kpoaypooarbvtngjtrau.supabase.co';
+const SB_KEY='sb_publishable_TAcUsigA7C0yiqjHFV15rQ_OtE30gpG';
+const sbHeaders=()=>({apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'});
+async function submitRemote(e){
+  if(!navigator.onLine) return false;
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/scores',{method:'POST',headers:{...sbHeaders(),Prefer:'return=minimal'},
+      body:JSON.stringify({name:e.n.slice(0,24),house:e.h,score:e.s})});
+    return r.ok;
+  }catch(_){ return false; }
+}
+async function fetchTop(){
+  const r=await fetch(SB_URL+'/rest/v1/scores?select=name,house,score&order=score.desc,created_at.asc&limit=10',{headers:sbHeaders()});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return (await r.json()).map(x=>({n:x.name,h:x.house,s:x.score}));
+}
+async function remoteRank(score){
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/scores?select=id&score=gt.'+score,
+      {headers:{...sbHeaders(),Prefer:'count=exact',Range:'0-0'}});
+    const total=parseInt((r.headers.get('content-range')||'').split('/')[1],10);
+    return Number.isFinite(total)?total+1:null;
+  }catch(_){ return null; }
+}
+async function loadBoard(hl){
+  const el=document.getElementById('bl'); if(!el) return;
+  try{ const rows=await fetchTop(); if(rows.length) el.innerHTML=boardHTML(hl,rows); }
+  catch(_){ /* offline: keep the local list */ }
 }
 
-// ── LANG TOGGLE ──
-document.getElementById('lang-btn').addEventListener('click',()=>{
-  LANG.current=LANG.current==='en'?'th':'en';
-  document.getElementById('lang-btn').textContent=LANG.current==='en'?'TH / EN':'EN / TH';
-  document.body.style.fontFamily=LANG.current==='th'?"'Kanit','Crimson Text',serif":"'Crimson Text','Kanit',serif";
-  render();
-});
+/* ───────────── LEADERBOARD UI ───────────── */
+function boardHTML(hl,rows){
+  const t=T(), L=rows||(store.get()||{}).scores||[];
+  const isMe=e=>!!hl&&e.n===hl.n&&e.s===hl.s;
+  if(!L.length) return `<p class="desc" style="padding:14px 0">${t.noScores}</p>`;
+  return `<ol class="board">${L.slice(0,10).map((e,i)=>`<li class="${isMe(e)?'me':''}" style="animation-delay:${i*.06}s"><b>${i<3?['🥇','🥈','🥉'][i]:i+1}</b><span class="bn">${HOUSE_META[e.h]?HOUSE_META[e.h].emoji:''} ${esc(e.n)}<small>${esc(t.houses[e.h]?t.houses[e.h].name:'')}${isMe(e)?' · '+t.you:''}</small></span><em>${e.s}</em></li>`).join('')}</ol>`;
+}
+function openBoard(hl){
+  const t=T(), ov=document.createElement('div'); ov.className='sheet';
+  ov.innerHTML=`<div class="sbox"><div class="sec-title">🏆 ${t.board}</div><div id="bl">${boardHTML(hl)}</div><button class="btn ghost" id="bclose">${esc('✕')}</button></div>`;
+  document.body.appendChild(ov); haptic(10); loadBoard(hl);
+  const close=()=>ov.remove(); ov.querySelector('#bclose').onclick=close; ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
+}
+async function shareScore(score){
+  const t=T(), text=t.shareScore(state.name,t.houses[state.result].name,score), url=location.origin+location.pathname;
+  if(navigator.share){ try{ await navigator.share({title:t.game,text,url}); }catch(e){} return; }
+  try{ await navigator.clipboard.writeText(`${text} ${url}`); toast(t.copied); }catch(e){ prompt('Copy:',text+' '+url); }
+}
 
-render();
+/* ───────────── MINI-GAME: CATCH FALLING STARS ───────────── */
+function openGame(){
+  const t=T(); haptic(20);
+  const ov=document.createElement('div'); ov.className='game';
+  ov.innerHTML=`<canvas></canvas><div class="ghud"><span>${t.points}<b id="gs">0</b></span><span>⏳<b id="gt">20</b></span><button id="gx" aria-label="${t.close}">✕</button></div><div class="gend" hidden></div>`;
+  document.body.appendChild(ov); document.body.style.overflow='hidden';
+  const cv=ov.querySelector('canvas'), c=cv.getContext('2d'), DPR=Math.min(devicePixelRatio||1,2);
+  let W,H; const size=()=>{ W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; c.setTransform(DPR,0,0,DPR,0,0); };
+  size(); addEventListener('resize',size);
+  const accent=getComputedStyle(document.body).getPropertyValue('--accent-l').trim()||'#F3DC8A';
+  const DUR=20000; let items=[], pops=[], score=0, t0=null, last=0, spawnAt=0, raf=0, over=false;
+  const gs=ov.querySelector('#gs'), gt=ov.querySelector('#gt');
+  function spawn(el){
+    const r=Math.random(), type=r<.12?'comet':r<.3?'orb':'star', speed=1+el/DUR*.9;
+    items.push({ type, x:30+Math.random()*(W-60), y:-30, r:type==='comet'?16:type==='orb'?18:20,
+      vy:(type==='comet'?.38:.15+Math.random()*.12)*speed, rot:Math.random()*6, vr:(Math.random()-.5)*.004 });
+  }
+  function starPath(x,y,r,rot){ c.beginPath(); for(let i=0;i<10;i++){ const a=rot+i*Math.PI/5-Math.PI/2, rr=i%2?r*.45:r; c.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr); } c.closePath(); }
+  function frame(now){
+    if(t0===null){ t0=now; last=now; }
+    const dt=Math.min(50,now-last); last=now;
+    const el=now-t0, left=Math.max(0,DUR-el);
+    gt.textContent=Math.ceil(left/1000);
+    if(el>=spawnAt && left>0){ spawn(el); spawnAt=el+Math.max(220,520-el/60); }
+    c.clearRect(0,0,W,H);
+    items=items.filter(o=>o.y<H+40 && !o.dead);
+    for(const o of items){
+      o.y+=o.vy*dt; o.rot+=o.vr*dt; c.save();
+      if(o.type==='orb'){
+        const g=c.createRadialGradient(o.x-5,o.y-5,2,o.x,o.y,o.r); g.addColorStop(0,'#b58cff'); g.addColorStop(.5,'#3b145e'); g.addColorStop(1,'#0a0312');
+        c.fillStyle=g; c.shadowColor='#ff3b6b'; c.shadowBlur=18; c.beginPath(); c.arc(o.x,o.y,o.r,0,6.283); c.fill();
+      } else {
+        if(o.type==='comet'){ const tg=c.createLinearGradient(o.x,o.y-90,o.x,o.y); tg.addColorStop(0,'rgba(255,255,255,0)'); tg.addColorStop(1,accent); c.strokeStyle=tg; c.lineWidth=6; c.lineCap='round'; c.beginPath(); c.moveTo(o.x,o.y-90); c.lineTo(o.x,o.y); c.stroke(); }
+        c.fillStyle=o.type==='comet'?accent:'#F3DC8A'; c.shadowColor=c.fillStyle; c.shadowBlur=20; starPath(o.x,o.y,o.r,o.rot); c.fill();
+      }
+      c.restore();
+    }
+    pops=pops.filter(p=>(p.life-=dt)>0);
+    for(const p of pops){ c.save(); c.globalAlpha=p.life/700; c.font='700 24px Cinzel, serif'; c.textAlign='center'; c.fillStyle=p.v>0?'#F3DC8A':'#ff6b8b'; c.fillText((p.v>0?'+':'')+p.v,p.x,p.y-(700-p.life)*.06); c.restore(); }
+    if(left<=0){ end(); return; }
+    raf=requestAnimationFrame(frame);
+  }
+  cv.addEventListener('pointerdown',e=>{
+    if(over) return;
+    for(let i=items.length-1;i>=0;i--){
+      const o=items[i];
+      if(!o.dead && Math.hypot(o.x-e.clientX,o.y-e.clientY)<o.r+16){
+        o.dead=true; const v=o.type==='star'?10:o.type==='comet'?30:-20;
+        score=Math.max(0,score+v); gs.textContent=score;
+        pops.push({x:o.x,y:o.y,v,life:700}); burst(o.x,o.y,v>0?14:8); haptic(v>0?10:[40,30,40]);
+        sfx(v<0?'bad':o.type==='comet'?'comet':'star');
+        const cls=v<0?'hit-bad':'hit-good'; ov.classList.remove('hit-bad','hit-good'); void ov.offsetWidth; ov.classList.add(cls);
+        gs.classList.remove('bump'); void gs.offsetWidth; gs.classList.add('bump');
+        break;
+      }
+    }
+  });
+  function end(){
+    over=true; c.clearRect(0,0,W,H);
+    const prev=(store.get()||{}).best||0, best=Math.max(prev,score), isNew=score>prev;
+    const entry={ n:state.name, h:state.result, s:score, d:Date.now() };
+    let list=((store.get()||{}).scores||[]).slice();
+    if(score>0) list.push(entry);
+    list.sort((a,b)=>b.s-a.s||a.d-b.d); list=list.slice(0,30);
+    const rank=list.findIndex(e=>e.d===entry.d)+1;
+    persist({best,scores:list}); const bv=$('#bestv'); if(bv) bv.textContent=best;
+    const box=ov.querySelector('.gend'); box.hidden=false;
+    box.innerHTML=`<div class="sec-title">${isNew&&score>0?'🏆 '+t.newBest:t.points}</div><div class="gscore" id="gsc">0</div><div class="desc">${t.best} ${best} <span id="rk">${rank?'· '+t.rank(rank):''}</span></div>
+      <button class="btn house" id="gshare">📤 ${t.share2}</button>
+      <button class="btn ghost" id="gboard" style="margin-top:10px">${t.boardBtn}</button>
+      <button class="btn ghost" id="gagain" style="margin-top:10px">${t.again}</button>
+      <button class="btn ghost" id="gclose" style="margin-top:10px">${t.close}</button>`;
+    sfx(isNew&&score>0?'record':'end'); haptic([30,50,30]);
+    // count-up
+    const sc=box.querySelector('#gsc'), t1=performance.now(), D=Math.min(1400,400+score*8);
+    (function up(n){ const k=Math.min(1,(n-t1)/D); sc.textContent=Math.round(score*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(up); else { sc.classList.add('done'); } })(t1);
+    // confetti
+    const fire=(i)=>burst(innerWidth*(.15+Math.random()*.7),innerHeight*(.2+Math.random()*.35),28);
+    if(score>0) for(let i=0;i<(isNew?7:3);i++) setTimeout(()=>fire(i),i*260);
+    box.querySelector('#gshare').onclick=()=>shareScore(score);
+    box.querySelector('#gboard').onclick=()=>openBoard({n:state.name,s:score});
+    if(score>0) submitRemote(entry).then(ok=>ok?remoteRank(score):null).then(r=>{ const k=box.querySelector('#rk'); if(k&&r) k.textContent='· '+t.rank(r); });
+    box.querySelector('#gagain').onclick=()=>{ close(); openGame(); };
+    box.querySelector('#gclose').onclick=close;
+  }
+  function close(){ cancelAnimationFrame(raf); removeEventListener('resize',size); ov.remove(); document.body.style.overflow=''; }
+  ov.querySelector('#gx').onclick=close;
+  raf=requestAnimationFrame(frame);
+}
+
+/* ───────────── BANNER PARTICLES ───────────── */
+let fxId=null;
+function stopBannerFx(){ if(fxId) cancelAnimationFrame(fxId); fxId=null; }
+function startBannerFx(h){
+  const cv=$('#bfx'); if(!cv) return;
+  const DPR=Math.min(devicePixelRatio||1,2), W=cv.offsetWidth, H=cv.offsetHeight;
+  cv.width=W*DPR; cv.height=H*DPR; const c=cv.getContext('2d'); c.scale(DPR,DPR);
+  const conf={ valor:{hue:[10,45],up:1.6,sz:3}, loyal:{hue:[38,52],up:.6,sz:3.5}, wisdom:{hue:[205,235],up:.3,sz:2}, ambit:{hue:[120,150],up:.5,sz:4} }[h];
+  const ps=Array.from({length:55},()=>mk(true));
+  function mk(init){ return { x:Math.random()*W, y:init?Math.random()*H:H+6, vy:-(Math.random()*conf.up+.2), vx:(Math.random()-.5)*.5, r:Math.random()*conf.sz+.6, life:Math.random()*.6+.4, ph:Math.random()*6.28, hue:conf.hue[0]+Math.random()*(conf.hue[1]-conf.hue[0]) }; }
+  (function loop(){
+    c.clearRect(0,0,W,H);
+    for(const p of ps){ p.ph+=.05; p.x+=p.vx+Math.sin(p.ph)*.3; p.y+=p.vy; p.life-=.004; if(p.life<=0||p.y<-6) Object.assign(p,mk(false),{life:1});
+      c.globalAlpha=Math.max(0,p.life)*(.5+.5*Math.sin(p.ph*1.7)); c.fillStyle=`hsl(${p.hue},95%,${h==='wisdom'?85:65}%)`;
+      c.shadowColor=c.fillStyle; c.shadowBlur=8; c.beginPath(); c.arc(p.x,p.y,p.r,0,6.283); c.fill(); }
+    fxId=requestAnimationFrame(loop);
+  })();
+}
+
+/* ───────────── ID CARD (1080×1920 canvas) ───────────── */
+async function buildCard(){
+  try { await document.fonts.ready; await Promise.all(['700 40px Cinzel','500 40px Prompt','italic 40px "Cormorant Garamond"'].map(f=>document.fonts.load(f))); } catch(e){}
+  const t=T(), h=state.result, m=HOUSE_META[h], hd=t.houses[h], rl=relics(), d=daily(), th=lang==='th';
+  const W=1080, H=1920, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const c=cv.getContext('2d');
+  const EN='Cinzel, serif', TH='Prompt, sans-serif', SER='"Cormorant Garamond", Prompt, serif', F = th?TH:EN;
+  const GOLD='#D4AF37';
+  // background
+  let g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,m.bg[0]); g.addColorStop(.45,m.bg[1]); g.addColorStop(1,m.bg[2]); c.fillStyle=g; c.fillRect(0,0,W,H);
+  g=c.createRadialGradient(W/2,560,0,W/2,560,800); g.addColorStop(0,hexA(m.c1,.55)); g.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=g; c.fillRect(0,0,W,H);
+  const r=rng(hash(state.name)); for(let i=0;i<320;i++){ c.globalAlpha=r()*.6+.1; c.fillStyle=r()<.5?'#F3DC8A':'#fff'; c.beginPath(); c.arc(r()*W,r()*H,r()*2.2+.3,0,6.283); c.fill(); } c.globalAlpha=1;
+  // frames
+  c.strokeStyle=GOLD; c.lineWidth=6; c.globalAlpha=.8; c.strokeRect(48,48,W-96,H-96); c.lineWidth=2; c.globalAlpha=.4; c.strokeRect(68,68,W-136,H-136); c.globalAlpha=1;
+  const txt=(s,x,y,font,col,{align='center',blur=0,alpha=1}={})=>{ c.save(); c.font=font; c.fillStyle=col; c.textAlign=align; c.textBaseline='middle'; c.globalAlpha=alpha; if(blur){c.shadowColor=col;c.shadowBlur=blur;} c.fillText(s,x,y); c.restore(); };
+  [[96,96],[W-96,96],[96,H-96],[W-96,H-96]].forEach(([x,y])=>txt('✦',x,y,'44px serif',GOLD));
+  txt(th?t.school:TEXT.en.school.toUpperCase(), W/2,160, `600 ${th?38:34}px ${F}`, GOLD,{alpha:.9});
+  txt(t.idTitle, W/2,215, `500 ${th?30:26}px ${F}`, '#F2E6CC',{alpha:.6});
+  line(150,260,W-150);
+  // crest
+  c.save(); c.translate(W/2,520);
+  shield(c,0,0,300); c.fillStyle=(()=>{const gg=c.createLinearGradient(-150,-170,150,170); gg.addColorStop(0,m.c1); gg.addColorStop(1,'#05040a'); return gg;})(); c.fill();
+  c.lineWidth=10; c.strokeStyle=GOLD; c.shadowColor=m.c1; c.shadowBlur=60; c.stroke(); c.restore();
+  txt(m.emoji, W/2,530, '170px serif','#fff');
+  // name + house
+  const nm=fit(state.name, 900, th||/[^\x00-\x7F]/.test(state.name)?TH:EN, 110, '700');
+  txt(state.name, W/2,820, nm, '#ffffff',{blur:30});
+  txt((th?'บ้าน ':'HOUSE ')+hd.name.toUpperCase(), W/2,925, `700 ${th?64:60}px ${F}`, m.c1==='#E0A526'?'#F4D27A':lighten(m.c1), {blur:24});
+  txt(`“${hd.motto}”`, W/2,1000, `${th?'400':'italic 500'} ${th?36:42}px ${th?TH:SER}`, '#F2E6CC',{alpha:.8});
+  line(150,1070,W-150);
+  // relic panels
+  panel(110,1110,410,380); panel(560,1110,410,380);
+  txt('🪄',315,1180,'70px serif','#fff');
+  txt(t.wand.toUpperCase(),315,1260,`600 ${th?32:28}px ${F}`,GOLD);
+  txt(rl.wood,315,1320,`600 ${th?38:44}px ${th?TH:SER}`,'#fff');
+  txt(rl.core,315,1378,`400 ${th?26:30}px ${th?TH:SER}`,'#F2E6CC',{alpha:.85});
+  txt(`${rl.len} · ${rl.flex}`,315,1428,`400 ${th?24:28}px ${th?TH:SER}`,'#F2E6CC',{alpha:.7});
+  txt(rl.patEmoji,765,1190,'90px serif','#fff');
+  txt(t.patronus.toUpperCase(),765,1290,`600 ${th?32:28}px ${F}`,GOLD);
+  txt(rl.patName,765,1360,`600 ${th?42:50}px ${th?TH:SER}`,'#fff');
+  txt(t.spirit,765,1420,`400 ${th?24:28}px ${th?TH:SER}`,'#F2E6CC',{alpha:.7});
+  // daily spell
+  txt('✦ '+t.today+' ✦', W/2,1570,`600 ${th?30:26}px ${F}`,GOLD,{alpha:.85});
+  txt(d.spell, W/2,1630,`700 ${th?50:56}px ${th?TH:EN}`,'#F3DC8A',{blur:20});
+  // footer
+  line(150,1710,W-150);
+  txt(`${t.idNo} ${rl.idNo}  ·  ${t.points} ${(store.get()||{}).best||0}  ·  ${new Date().getFullYear()}`, W/2,1765,`500 28px ${EN}`,'#F2E6CC',{alpha:.6});
+  txt('✦ RICHER NFC ✦', W/2,1820,`700 30px ${EN}`,GOLD);
+  return cv;
+
+  function line(x1,y,x2){ c.save(); const lg=c.createLinearGradient(x1,0,x2,0); lg.addColorStop(0,'rgba(212,175,55,0)'); lg.addColorStop(.5,GOLD); lg.addColorStop(1,'rgba(212,175,55,0)'); c.strokeStyle=lg; c.lineWidth=2; c.beginPath(); c.moveTo(x1,y); c.lineTo(x2,y); c.stroke(); c.restore(); }
+  function panel(x,y,w,hh){ c.save(); c.beginPath(); c.roundRect?c.roundRect(x,y,w,hh,28):c.rect(x,y,w,hh); c.fillStyle='rgba(0,0,0,.35)'; c.fill(); c.strokeStyle=hexA(m.c1,.9); c.lineWidth=3; c.stroke(); c.restore(); }
+  function fit(s,maxW,fam,start,wt){ let sz=start; do{ c.font=`${wt} ${sz}px ${fam}`; sz-=4; } while(c.measureText(s).width>maxW && sz>40); return c.font; }
+}
+function shield(c,x,y,w){ const s=w/100; c.beginPath(); c.moveTo(x,y-56*s); c.lineTo(x+42*s,y-42*s); c.lineTo(x+42*s,y); c.bezierCurveTo(x+42*s,y+28*s,x+22*s,y+46*s,x,y+56*s); c.bezierCurveTo(x-22*s,y+46*s,x-42*s,y+28*s,x-42*s,y); c.lineTo(x-42*s,y-42*s); c.closePath(); }
+function hexA(hex,a){ const [r,g,b]=hex.match(/\w\w/g).map(x=>parseInt(x,16)); return `rgba(${r},${g},${b},${a})`; }
+function lighten(hex){ const [r,g,b]=hex.match(/\w\w/g).map(x=>Math.min(255,parseInt(x,16)+90)); return `rgb(${r},${g},${b})`; }
+
+async function saveCard(){
+  const btn=$('#save'); if(btn.classList.contains('loading')) return;
+  haptic(20); btn.classList.add('loading');
+  try{
+    const cv=await buildCard();
+    const blob=await new Promise(res=>cv.toBlob(res,'image/png'));
+    const fname=`Richer-ID-${state.name.replace(/[^\w฀-๿-]+/g,'_')}.png`;
+    const file=new File([blob],fname,{type:'image/png'});
+    const mobile = matchMedia('(pointer:coarse)').matches;
+    if(mobile && navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:T().title}); }catch(e){ if(e.name!=='AbortError') download(blob,fname); }
+    } else download(blob,fname);
+    haptic([20,40,20]); toast(T().saved);
+  }catch(e){ console.error(e); toast('⚠️ '+e.message); }
+  finally{ btn.classList.remove('loading'); }
+}
+function download(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); }
+
+async function shareLink(){
+  haptic(15); const url=location.origin+location.pathname; const text=T().shareText(state.name, T().houses[state.result].name);
+  if(navigator.share){ try{ await navigator.share({title:T().title,text,url}); }catch(e){} return; }
+  try{ await navigator.clipboard.writeText(`${text} ${url}`); toast(T().copied); }catch(e){ prompt('Copy link:',url); }
+}
+
+/* ───────────── BOOT ───────────── */
+applyLang();
+render(false);
+})();
 </script>
 </body>
 </html>
