@@ -1,0 +1,21 @@
+hogwarts_logo.svg
+  s_ded14bf9a4a84a::t_6b8ec00739258b 1-10997
+index.html
+  s_ded14bf9a4a84a::t_52e61d98dcb8cd 79,585
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.3",
+  "base_commit_sha": "c1124bb9c5686352bb292f031d75f9d155d5d585",
+  "prompts": {},
+  "sessions": {
+    "s_ded14bf9a4a84a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1aec62f-da81-4ab7-87f8-68759122dd90",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "numchaincs <numchai.nc@gmail.com>"
+    }
+  }
+}
