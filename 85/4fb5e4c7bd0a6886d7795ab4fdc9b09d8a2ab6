@@ -1,0 +1,19 @@
+index.html
+  s_ded14bf9a4a84a::t_42b1fcab4c92e4 351-354,412-415
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.3",
+  "base_commit_sha": "854fb5e4c7bd0a6886d7795ab4fdc9b09d8a2ab6",
+  "prompts": {},
+  "sessions": {
+    "s_ded14bf9a4a84a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1aec62f-da81-4ab7-87f8-68759122dd90",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "numchaincs <numchai.nc@gmail.com>"
+    }
+  }
+}
