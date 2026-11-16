@@ -76,7 +76,7 @@
   .orn{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--accent-l);opacity:.7}
   .orn::before,.orn::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--accent-l),transparent)}
 
-  .crest{width:96px;height:96px;filter:drop-shadow(0 0 22px rgba(212,175,55,.35));animation:float 5s ease-in-out infinite}
+  .crest{width:112px;height:112px;object-fit:contain;filter:drop-shadow(0 0 22px rgba(212,175,55,.35));animation:float 5s ease-in-out infinite}
   @keyframes float{50%{transform:translateY(-6px)}}
 
   /* intro */
@@ -582,13 +582,7 @@ langBtn.addEventListener('click',()=>{ haptic(10); const inp=$('#name'); if(inp)
 
 /* ───────────── SVG ───────────── */
 function academyCrest(){
-  return `<svg class="crest" viewBox="0 0 100 116" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2c0"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#7a5b14"/></linearGradient></defs>
-  <path d="M50 4 92 18v38c0 28-20 46-42 56C28 102 8 84 8 56V18Z" fill="#0d0b14" stroke="url(#cg)" stroke-width="2.5"/>
-  <path d="M50 12 84 23v33c0 22-16 38-34 46-18-8-34-24-34-46V23Z" fill="none" stroke="url(#cg)" stroke-width=".8" opacity=".6"/>
-  <path d="M50 12v90M16 56h68" stroke="url(#cg)" stroke-width=".8" opacity=".5"/>
-  <text x="33" y="42" font-size="15" text-anchor="middle">🦁</text><text x="67" y="42" font-size="15" text-anchor="middle">🦅</text>
-  <text x="33" y="80" font-size="15" text-anchor="middle">🐍</text><text x="67" y="80" font-size="15" text-anchor="middle">🦡</text>
-  <circle cx="50" cy="56" r="11" fill="#0d0b14" stroke="url(#cg)" stroke-width="1.5"/><text x="50" y="61" font-family="Cinzel,serif" font-weight="700" font-size="13" fill="url(#cg)" text-anchor="middle">R</text></svg>`;
+  return `<img class="crest" src="hogwarts_logo.svg" width="112" height="112" alt="" decoding="async">`;
 }
 function houseCrest(h){
   const m=HOUSE_META[h];
