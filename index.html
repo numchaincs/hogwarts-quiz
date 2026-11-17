@@ -276,15 +276,6 @@
   .game .gend #gshare{margin-top:16px}
 
   .sheet{position:fixed;inset:0;z-index:58;display:grid;place-items:center;padding:20px;background:rgba(3,2,8,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:enter .35s both}
-  .sbox{width:min(400px,100%);max-height:86vh;overflow:auto;padding:24px 18px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(28,24,40,.98),rgba(12,10,18,.98));border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6)}
-  .board{list-style:none}
-  .board li{display:flex;align-items:center;gap:12px;padding:11px 12px;margin-bottom:8px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);animation:enter .5s both}
-  .board li.me{border-color:var(--gold);background:rgba(212,175,55,.12);box-shadow:0 0 22px rgba(212,175,55,.25)}
-  .board b{width:30px;text-align:center;font:700 16px var(--en);color:var(--accent-l)}
-  .board .bn{flex:1;font:600 16px var(--serif);color:#fff;display:flex;flex-direction:column;line-height:1.25;min-width:0;overflow-wrap:anywhere}
-  .lang-th .board .bn{font:500 14px var(--th)}
-  .board small{font:400 11px var(--th);color:var(--muted)}
-  .board em{font:700 20px var(--en);font-style:normal;color:var(--gold-l)}
 
   /* hold-to-cast: make the gesture obvious */
   .cast-btn::before,.cast-btn::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(var(--accent-rgb),.65);pointer-events:none;animation:ripple 2s ease-out infinite}
@@ -360,6 +351,51 @@
   .dk.ig{background:linear-gradient(45deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888);color:#fff;border:0}
   .dk.busy{opacity:.5;pointer-events:none;animation:pulse .8s ease-in-out infinite}
 
+  /* leaderboard: gold frame, house-coloured arched podium */
+  .sbox{position:relative;width:min(400px,100%);max-height:86vh;padding:0;overflow:hidden;border-radius:22px;
+    background:radial-gradient(120% 55% at 50% 0%,rgba(40,60,140,.5),transparent 62%),linear-gradient(180deg,#0a0f2c,#070816 70%);
+    border:2px solid var(--gold);box-shadow:0 0 0 5px rgba(7,8,22,.9),0 0 0 6px rgba(212,175,55,.45),0 24px 70px rgba(0,0,0,.7)}
+  .sscroll{position:relative;z-index:1;max-height:86vh;overflow-y:auto;padding:30px 16px 24px}
+  .sbox .xbtn{z-index:3}
+  .cn{position:absolute;width:62px;height:62px;pointer-events:none;z-index:0}
+  .cn.tl{top:0;left:0;background:#C0262D;clip-path:polygon(0 0,100% 0,0 100%)}
+  .cn.tr{top:0;right:0;background:#1F8A4C;clip-path:polygon(0 0,100% 0,100% 100%)}
+  .cn.bl{bottom:0;left:0;background:#E0A526;clip-path:polygon(0 0,0 100%,100% 100%)}
+  .cn.br{bottom:0;right:0;background:#2F5BD3;clip-path:polygon(100% 0,100% 100%,0 100%)}
+  .btitle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px;font:700 15px var(--en);letter-spacing:5px;text-transform:uppercase;color:var(--gold-l);text-shadow:0 0 16px rgba(212,175,55,.5)}
+  .lang-th .btitle{font-family:var(--th);letter-spacing:1px;font-size:17px;font-weight:600}
+  .btitle span{color:var(--gold);font-size:12px}
+  .podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:18px}
+  .pod{position:relative;flex:1;min-width:0;text-align:center;padding:24px 6px 12px;border-radius:70px 70px 14px 14px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);
+    background:linear-gradient(180deg,var(--hc),rgba(6,5,12,.94) 120%);border:2px solid var(--gold);
+    box-shadow:inset 0 0 0 3px rgba(6,5,12,.55),inset 0 0 0 4px rgba(212,175,55,.45),0 10px 26px rgba(0,0,0,.5),0 0 26px -6px var(--hc);animation:enter .6s both}
+  .pod.p1{min-height:208px;padding-top:32px}
+  .pod.p2,.pod.p3{min-height:174px}
+  .pod.me{border-color:#fff3b0;box-shadow:inset 0 0 0 3px rgba(6,5,12,.55),inset 0 0 0 4px rgba(255,243,176,.7),0 0 34px rgba(255,236,150,.55)}
+  .pmed{position:absolute;top:-13px;left:50%;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 14px var(--en);color:#1a1204;border:2px solid #fff6d0;box-shadow:0 2px 8px rgba(0,0,0,.5);text-shadow:none}
+  .p1 .pmed{background:linear-gradient(135deg,#fff3b0,#d4af37)}
+  .p2 .pmed{background:linear-gradient(135deg,#f4f6f8,#9aa4ae)}
+  .p3 .pmed{background:linear-gradient(135deg,#f0c394,#b06a2c)}
+  .pcrest{font-size:30px;line-height:1;margin:4px 0 8px;filter:drop-shadow(0 0 10px rgba(255,255,255,.35))}
+  .p1 .pcrest{font-size:42px}
+  .pn{padding:0 4px;font:700 15px var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lang-th .pn{font:600 14px var(--th)}
+  .phn{padding:0 2px;margin-top:2px;font:500 10px var(--th);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ps{margin-top:8px;font:900 24px var(--en);color:var(--gold-l)}
+  .p1 .ps{font-size:31px}
+  .rows{list-style:none;margin:0}
+  .row{position:relative;display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:10px 12px 10px 14px;border-radius:12px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(212,175,55,.22);border-left:4px solid var(--hc);
+    box-shadow:inset 26px 0 30px -24px var(--hc);animation:enter .5s both}
+  .row.me{border-color:var(--gold);border-left-color:var(--hc);background:rgba(212,175,55,.1);box-shadow:inset 26px 0 30px -24px var(--hc),0 0 20px rgba(212,175,55,.3)}
+  .row b{width:24px;text-align:center;font:700 15px var(--en);color:var(--gold-l)}
+  .row .rc{font-size:22px}
+  .row .bn{flex:1;min-width:0;display:flex;flex-direction:column;font:600 16px/1.25 var(--serif);color:#fff;overflow-wrap:anywhere}
+  .lang-th .row .bn{font:500 14px/1.3 var(--th)}
+  .row small{font:400 11px var(--th);color:var(--muted)}
+  .row em{font:700 19px var(--en);font-style:normal;color:var(--gold-l)}
+  .btn.busy{opacity:.5;pointer-events:none}
+
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -420,7 +456,7 @@ const TEXT = {
     points:'House Points', best:'Best', play:'✦ Play ✦', again:'Play Again', close:'Close', newBest:'New Record!',
     streak:(n)=>`Visit streak · Day ${n}`,
     board:'Leaderboard', boardBtn:'🏆 Leaderboard', bSave:'Save', bIG:'IG Story', bPlay:'Play', bBoard:'Ranking',
-    igHint:'Image saved — open Instagram and add it to your Story', noScores:'No scores yet — be the first to play!', share2:'Share Score', rank:(n)=>`Rank #${n}`, you:'You',
+    igHint:'Image saved — open Instagram and add it to your Story', beat:'Can you beat me?', noScores:'No scores yet — be the first to play!', share2:'Share Score', rank:(n)=>`Rank #${n}`, you:'You',
     shareScore:(n,h,s)=>`${n} of House ${h} scored ${s} points catching stars ✨ Can you beat me?`,
     houses:{
       valor:{name:'Gryffindor', motto:'Brave of Heart, Strong of Soul', desc:'You belong in Gryffindor — the house of courage, bravery, and nerve. You charge into challenges head-on, defend others without hesitation, and lead by example. The lion\'s spirit runs in your blood.'},
@@ -482,7 +518,7 @@ const TEXT = {
     points:'แต้มบ้าน', best:'สูงสุด', play:'✦ เริ่มเล่น ✦', again:'เล่นอีกครั้ง', close:'ปิด', newBest:'สถิติใหม่!',
     streak:(n)=>`มาเยือนต่อเนื่อง · วันที่ ${n}`,
     board:'ตารางคะแนน', boardBtn:'🏆 ตารางคะแนน', bSave:'บันทึก', bIG:'แชร์ IG', bPlay:'เล่นเกม', bBoard:'อันดับ',
-    igHint:'บันทึกรูปแล้ว เปิด Instagram แล้วเลือกรูปลง Story ได้เลย', noScores:'ยังไม่มีคะแนน — มาเป็นคนแรกเลย!', share2:'แชร์คะแนน', rank:(n)=>`อันดับ ${n}`, you:'คุณ',
+    igHint:'บันทึกรูปแล้ว เปิด Instagram แล้วเลือกรูปลง Story ได้เลย', beat:'กล้ามาท้าไหม?', noScores:'ยังไม่มีคะแนน — มาเป็นคนแรกเลย!', share2:'แชร์คะแนน', rank:(n)=>`อันดับ ${n}`, you:'คุณ',
     shareScore:(n,h,s)=>`${n} จากบ้าน${h} ทำได้ ${s} แต้มในเกมเก็บดาว ✨ กล้ามาท้าไหม?`,
     houses:{
       valor:{name:'กริฟฟินดอร์', motto:'กล้าหาญ มีหัวใจ แข็งแกร่ง', desc:'คุณเป็นของกริฟฟินดอร์ — บ้านแห่งความกล้าหาญ ความมุ่งมั่น และจิตใจที่แน่วแน่ คุณพร้อมเผชิญความท้าทายโดยตรง ปกป้องผู้อื่นโดยไม่ลังเล และเป็นผู้นำด้วยตัวอย่าง วิญญาณของสิงโตไหลเวียนอยู่ในสายเลือดคุณ'},
@@ -981,19 +1017,68 @@ async function loadBoard(hl){
 
 /* ───────────── LEADERBOARD UI ───────────── */
 function boardHTML(hl,rows){
-  const t=T(), L=rows||(store.get()||{}).scores||[];
+  const t=T(), L=(rows||(store.get()||{}).scores||[]).slice(0,10);
   const isMe=e=>!!hl&&e.n===hl.n&&e.s===hl.s;
-  if(!L.length) return `<p class="desc" style="padding:14px 0">${t.noScores}</p>`;
-  return `<ol class="board">${L.slice(0,10).map((e,i)=>`<li class="${isMe(e)?'me':''}" style="animation-delay:${i*.06}s"><b>${i<3?['🥇','🥈','🥉'][i]:i+1}</b><span class="bn">${HOUSE_META[e.h]?HOUSE_META[e.h].emoji:''} ${esc(e.n)}<small>${esc(t.houses[e.h]?t.houses[e.h].name:'')}${isMe(e)?' · '+t.you:''}</small></span><em>${e.s}</em></li>`).join('')}</ol>`;
+  if(!L.length) return `<p class="desc" style="padding:18px 0;text-align:center">${t.noScores}</p>`;
+  const hv=e=>{ const m=HOUSE_META[e.h]||HOUSE_META.valor; return `--hc:${m.c1};--hc2:${m.c2}`; };
+  const hn=e=>esc(t.houses[e.h]?t.houses[e.h].name:'');
+  const em=e=>HOUSE_META[e.h]?HOUSE_META[e.h].emoji:'';
+  const pod=(e,i)=>`<div class="pod p${i+1} ${isMe(e)?'me':''}" style="${hv(e)};animation-delay:${.1+i*.12}s"><div class="pmed">${i+1}</div><div class="pcrest">${em(e)}</div><div class="pn">${esc(e.n)}</div><div class="phn">${hn(e)}${isMe(e)?' · '+t.you:''}</div><div class="ps">${e.s}</div></div>`;
+  const top=L.slice(0,3), order=[1,0,2].filter(i=>top[i]), rest=L.slice(3);
+  return `<div class="podium">${order.map(i=>pod(top[i],i)).join('')}</div>`+
+    (rest.length?`<ol class="rows">${rest.map((e,j)=>`<li class="row ${isMe(e)?'me':''}" style="${hv(e)};animation-delay:${.45+j*.05}s"><b>${j+4}</b><span class="rc">${em(e)}</span><span class="bn">${esc(e.n)}<small>${hn(e)}${isMe(e)?' · '+t.you:''}</small></span><em>${e.s}</em></li>`).join('')}</ol>`:'');
 }
 function openBoard(hl){
   const t=T(), ov=document.createElement('div'); ov.className='sheet';
-  ov.innerHTML=`<div class="sbox"><button class="xbtn" id="bclose" aria-label="${t.close}">✕</button><div class="sec-title">🏆 ${t.board}</div><div id="bl">${boardHTML(hl)}</div></div>`;
+  ov.innerHTML=`<div class="sbox"><i class="cn tl"></i><i class="cn tr"></i><i class="cn bl"></i><i class="cn br"></i><button class="xbtn" id="bclose" aria-label="${t.close}">✕</button><div class="sscroll"><div class="btitle"><span>✦</span>${t.board}<span>✦</span></div><div id="bl">${boardHTML(hl)}</div></div></div>`;
   document.body.appendChild(ov); haptic(10); loadBoard(hl);
   const close=()=>ov.remove(); ov.querySelector('#bclose').onclick=close; ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
 }
-async function shareScore(score){
+
+/* ───────────── SCORE CARD (1080×1920, house colours) ───────────── */
+async function buildScoreCard(score,rank){
+  try{ await document.fonts.ready; await Promise.all(['700 40px Cinzel','600 40px Prompt'].map(f=>document.fonts.load(f))); }catch(e){}
+  const t=T(), h=state.result, m=HOUSE_META[h], hd=t.houses[h], th=lang==='th';
+  const W=1080, H=1920, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const c=cv.getContext('2d');
+  const EN='Cinzel, serif', TH='Prompt, sans-serif', F=th?TH:EN, GOLD='#D4AF37';
+  let g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,m.bg[0]); g.addColorStop(.5,m.bg[1]); g.addColorStop(1,m.bg[2]); c.fillStyle=g; c.fillRect(0,0,W,H);
+  g=c.createRadialGradient(W/2,900,0,W/2,900,860); g.addColorStop(0,hexA(m.c1,.65)); g.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=g; c.fillRect(0,0,W,H);
+  const r=rng(hash(state.name+score)); for(let i=0;i<300;i++){ c.globalAlpha=r()*.6+.1; c.fillStyle=r()<.5?'#F3DC8A':'#fff'; c.beginPath(); c.arc(r()*W,r()*H,r()*2.2+.3,0,6.283); c.fill(); } c.globalAlpha=1;
+  const S=230;
+  [[0,0,1,1],[W,0,-1,1],[0,H,1,-1],[W,H,-1,-1]].forEach(([x,y,sx,sy],i)=>{
+    c.fillStyle=hexA(i%2?m.c2:m.c1,.92); c.beginPath(); c.moveTo(x,y); c.lineTo(x+S*sx,y); c.lineTo(x,y+S*sy); c.closePath(); c.fill();
+    c.strokeStyle=GOLD; c.lineWidth=4; c.beginPath(); c.moveTo(x+S*sx,y); c.lineTo(x,y+S*sy); c.stroke();
+  });
+  c.strokeStyle=GOLD; c.lineWidth=6; c.globalAlpha=.85; c.strokeRect(48,48,W-96,H-96); c.lineWidth=2; c.globalAlpha=.4; c.strokeRect(68,68,W-136,H-136); c.globalAlpha=1;
+  const txt=(s,x,y,font,col,{blur=0,alpha=1}={})=>{ c.save(); c.font=font; c.fillStyle=col; c.textAlign='center'; c.textBaseline='middle'; c.globalAlpha=alpha; if(blur){c.shadowColor=col;c.shadowBlur=blur;} c.fillText(s,x,y); c.restore(); };
+  const fit=(s,maxW,fam,start,wt)=>{ let sz=start; do{ c.font=`${wt} ${sz}px ${fam}`; sz-=4; }while(c.measureText(s).width>maxW&&sz>40); return c.font; };
+  txt('✦',W/2,300,'44px serif',GOLD,{alpha:.9});
+  txt(th?t.game:t.game.toUpperCase(),W/2,375,`600 ${th?48:42}px ${F}`,GOLD,{alpha:.95});
+  c.save(); c.translate(W/2,660); shield(c,0,0,330);
+  const sg=c.createLinearGradient(-160,-180,160,180); sg.addColorStop(0,m.c1); sg.addColorStop(1,'#05040a'); c.fillStyle=sg; c.fill();
+  c.lineWidth=10; c.strokeStyle=GOLD; c.shadowColor=m.c1; c.shadowBlur=60; c.stroke(); c.restore();
+  txt(m.emoji,W/2,672,'190px serif','#fff');
+  txt(state.name,W/2,985,fit(state.name,900,/[^\x00-\x7F]/.test(state.name)?TH:EN,110,'700'),'#ffffff',{blur:30});
+  txt((th?'บ้าน ':'HOUSE ')+(th?hd.name:hd.name.toUpperCase()),W/2,1090,`700 ${th?64:58}px ${F}`,m.c1==='#E0A526'?'#F4D27A':lighten(m.c1),{blur:24});
+  txt(th?t.points:t.points.toUpperCase(),W/2,1235,`600 ${th?40:36}px ${F}`,GOLD,{alpha:.9});
+  txt(String(score),W/2,1430,`900 ${score>999?240:300}px ${EN}`,'#F3DC8A',{blur:50});
+  if(rank){
+    const label=t.rank(rank); c.font=`600 ${th?44:40}px ${F}`; const tw=c.measureText(label).width+90;
+    c.save(); c.beginPath(); c.roundRect?c.roundRect(W/2-tw/2,1578,tw,84,42):c.rect(W/2-tw/2,1578,tw,84); c.fillStyle='rgba(0,0,0,.4)'; c.fill(); c.strokeStyle=GOLD; c.lineWidth=3; c.stroke(); c.restore();
+    txt(label,W/2,1620,`600 ${th?44:40}px ${F}`,'#F3DC8A');
+  }
+  txt(t.beat,W/2,1745,`${th?'500':'italic 500'} ${th?44:50}px ${th?TH:'"Cormorant Garamond", serif'}`,'#F2E6CC',{alpha:.9});
+  txt(location.host,W/2,1815,`500 28px ${EN}`,GOLD,{alpha:.7});
+  return cv;
+}
+async function shareScore(score,rank){
   const t=T(), text=t.shareScore(state.name,t.houses[state.result].name,score), url=location.origin+location.pathname;
+  try{
+    const cv=await buildScoreCard(score,rank), blob=await new Promise(res=>cv.toBlob(res,'image/png'));
+    const fname='Score-'+state.name.replace(/[^\w฀-๿-]+/g,'_')+'.png', file=new File([blob],fname,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:t.game,text:`${text} ${url}`}); return; }
+    download(blob,fname); toast(t.igHint); return;
+  }catch(e){ if(e&&e.name==='AbortError') return; }
   if(navigator.share){ try{ await navigator.share({title:t.game,text,url}); }catch(e){} return; }
   try{ await navigator.clipboard.writeText(`${text} ${url}`); toast(t.copied); }catch(e){ prompt('Copy:',text+' '+url); }
 }
@@ -1062,7 +1147,7 @@ function openGame(){
     let list=((store.get()||{}).scores||[]).slice();
     if(score>0) list.push(entry);
     list.sort((a,b)=>b.s-a.s||a.d-b.d); list=list.slice(0,30);
-    const rank=list.findIndex(e=>e.d===entry.d)+1;
+    const rank=list.findIndex(e=>e.d===entry.d)+1; let shownRank=rank||null;
     persist({best,scores:list}); const bv=$('#bestv'); if(bv) bv.textContent=best;
     const box=ov.querySelector('.gend'); box.hidden=false;
     box.innerHTML=`<div class="sec-title">${isNew&&score>0?'🏆 '+t.newBest:t.points}</div><div class="gscore" id="gsc">0</div><div class="desc">${t.best} ${best} <span id="rk">${rank?'· '+t.rank(rank):''}</span></div>
@@ -1077,9 +1162,9 @@ function openGame(){
     // confetti
     const fire=(i)=>burst(innerWidth*(.15+Math.random()*.7),innerHeight*(.2+Math.random()*.35),28);
     if(score>0) for(let i=0;i<(isNew?7:3);i++) setTimeout(()=>fire(i),i*260);
-    box.querySelector('#gshare').onclick=()=>shareScore(score);
+    box.querySelector('#gshare').onclick=e=>withBusy(e.currentTarget,()=>shareScore(score,shownRank));
     box.querySelector('#gboard').onclick=()=>openBoard({n:state.name,s:score});
-    if(score>0) submitRemote(entry).then(ok=>ok?remoteRank(score):null).then(r=>{ const k=box.querySelector('#rk'); if(k&&r) k.textContent='· '+t.rank(r); });
+    if(score>0) submitRemote(entry).then(ok=>ok?remoteRank(score):null).then(r=>{ if(r) shownRank=r; const k=box.querySelector('#rk'); if(k&&r) k.textContent='· '+t.rank(r); });
     box.querySelector('#gagain').onclick=()=>{ close(); openGame(); };
     box.querySelector('#gclose').onclick=close;
   }
